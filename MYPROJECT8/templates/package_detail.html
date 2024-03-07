@@ -1,0 +1,242 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Package Details</title>
+    <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'Niwi_Travels/css/style.css' %}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <style>
+        /* Apply styles to the body element */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        /* Apply styles to the header element (navbar) */
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+        }
+
+        header a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        /* Apply styles to the main heading */
+        h1 {
+            color: #333;
+            margin-top: 20px;
+        }
+
+        /* Apply styles to the package details section */
+        p {
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        /* Apply styles to the package images section */
+        h2 {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .image-gallery img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Apply styles to the "Book Now" button */
+        button[type="submit"] {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Apply styles to the "Back to Home" link */
+        a {
+            color: #007BFF;
+            text-decoration: none;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        /* Media query for responsiveness */
+        @media (max-width: 768px) {
+            .image-gallery {
+                flex-direction: column;
+            }
+            .image-gallery img {
+                width: 100%;
+                max-width: none;
+            }
+        }
+        /* Apply styles to the package details section */
+p {
+    font-size: 16px;
+    margin: 10px 0;
+    color: #333;
+    font-family:'Times New Roman', Times, serif; /* Change the color to a darker shade, e.g., #333 (dark gray) */
+}
+.btn-close {
+    background-color: transparent;
+    border: none;
+    font-size: 1.5rem;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: #000;
+}
+
+/* Close button on hover */
+.btn-close:hover {
+    color: #555;
+}
+
+/* You can customize the styles further to match your website's design. */
+
+    /* Define custom alert styles */
+    .custom-alert {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: #007BFF;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        font-size: 16px;
+        z-index: 9999;
+    }
+    .navbar-logo img {
+        width: 50px;
+        height: 60px;
+        margin-right: 10px;
+    }
+    .profile-image {
+    max-width: 100px;
+    height: auto;
+}
+
+/* Style the "Profile" label */
+.text-center p {
+    font-weight: bold; /* Add bold font weight */
+    color: #333; /* Change the text color */
+    margin-top: 5px; /* Add space between the image and the label */
+}
+
+    </style>
+    </style>
+</head>
+<body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+    
+    <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light site-navbar-target" id="ftco-navbar">
+        <div class="container">
+            <img src="{% static 'Niwi_Travels/images/niwilogo.jpg' %}" alt="Logo" width="40px" height="35px"> <a class="navbar-brand" href="#">NIWI TRAVELS</a>
+
+
+          <div class="collapse navbar-collapse" id="ftco-nav">
+            <ul class="navbar-nav nav ml-auto">
+                
+              <li class="nav-item"><a href="/thome" class="nav-link"><span style="color: #fff;">Home</span></a></li>
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" style="color: #fff;">
+                    {{ user.username }}
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="/upcoming-journeys" id="#" style=" background-color: rgb(42, 165, 67);text-align: center;margin-top: 10px">Upcoming Journeys</a>
+                    <a class="dropdown-item" href="/ongoing-journeys" id="#" style=" background-color: rgb(218, 180, 13);text-align: center;margin-top: 10px">Ongoing Trips</a>
+                    <a class="dropdown-item" href="/history-journeys" id="#" style=" background-color: rgb(234, 0, 0);text-align: center;margin-top: 10px">History</a>
+                    <a class="dropdown-item" href="/viewprofileT" style=" background-color: rgb(151, 140, 245);text-align: center;margin-top: 10px">View Profile</a>
+                    <a class="dropdown-item" href="/tupdate" id="#" style=" background-color: rgb(195, 67, 172);text-align: center;margin-top: 10px">Update Profile</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="/logout" id="logout-link" style="color: rgb(255, 0, 0); background-color: rgb(40, 38, 38); text-align: center;margin-top: 10px">Logout</a>
+                </div>
+            </li>
+            </ul>
+            
+          </div>
+        </div>
+      </nav>
+
+
+    <br>
+    <main>
+        <section id="home-section" class="hero">
+            <h1>Package Details</h1>
+            <h2>{{ package.package_name }}</h2>
+            <p>
+                Explore the breathtaking destination of <span style="color: green; font-weight: bold;">{{ package.destination }}</span> on an unforgettable journey. 
+                You can enjoy this incredible adventure for just ₹<span style="color: blue;">{{ package.price }}</span>. 
+                The journey begins on <span style="color: red;">{{ package.start_date }}</span> from <span style="color: darkorange;">{{ package.description }}</span> and concludes on <span style="color: red;">{{ package.end_date }}</span>. 
+                Over the course of <span style="color: purple;">{{ package.duration }}</span> days, you'll experience a mix of excitement and discovery.
+            </p>
+            <p>
+                During your trip, you'll be accommodated in <span style="color: rgb(18, 16, 16);">{{ package.accommodation }}</span> lodgings, 
+                and your transportation will be provided with <span style="color: orange;">{{ package.transportation }}</span>. 
+                You'll have the opportunity to partake in a wide array of <span style="color: teal;">{{ package.activities }}</span>.
+            </p>
+            <p>
+                Your journey includes <span style="color: navy;">{{ package.inclusions }}</span>, ensuring a memorable experience. 
+                Please note that <span style="color: maroon;">{{ package.exclusions }}</span> are not covered.
+            </p>
+            <p>
+                The adventure falls into the <span style="color: darkslategray;">{{ package.category }}</span> category, 
+                and there are only <span style="color: darkred;">{{ package.availability }}</span> spots available, so be sure to book soon. 
+                Secure your place by <span style="color: darkblue;">{{ package.booking_deadline }}</span> and review our <span style="color: darkcyan;">{{ package.cancellation_policy }}</span> for peace of mind.
+            </p>
+            
+            
+            
+
+            <!-- Display the package images -->
+            <h2>Package Images</h2>
+            <div class="image-gallery">
+                {% for image in package.packageimage_set.all %}
+                    <img src="{{ image.image.url }}" alt="{{ image.package.package_name }} Image" width="250" height="250">
+                {% endfor %}
+            </div>
+
+            <!-- Add a "Book Now" button -->
+            <form method="POST" action="{% url 'add_passenger' package.id %}">
+                <input type="hidden" name="package.id" value="{{ package.id }}">
+                {% csrf_token %}
+                {% if user.is_authenticated %}
+                {% if not passenger %}
+                {% if not from_upcoming_journeys %}
+                <button type="submit">Book Now</button>
+                {% endif %}
+                {% endif %}
+                {% else %}
+                <a href="/log">Click Here to Login and Book Your Destination Soon.</a>
+                {% endif %}
+            </form>
+        </section>
+    </main>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

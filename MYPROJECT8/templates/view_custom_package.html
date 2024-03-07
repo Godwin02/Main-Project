@@ -1,0 +1,214 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Custom Travel Package</title>
+    <!-- Include any CSS stylesheets or JavaScript files here -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+</head>
+<style>
+    .sidebar {
+        background-color: #113156;
+        color: white;
+        position: fixed;
+        width: 250px;
+        height: 100%;
+        top: 0;
+        left: 0;
+        padding-top: 20px;
+    }
+
+    .sidebar a {
+        color: white;
+        text-decoration: none;
+        display: block;
+        padding: 15px;
+        font-size: 18px;
+        transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+        background-color: #cd1100;
+    }
+
+    .main-content {
+        margin-left: 250px;
+        padding: 20px;
+    }
+
+    /* Styling for the profile picture */
+    .profile-picture {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 20px auto;
+        background-color: #fff;
+        background-image: url("{% static 'Niwi_Travels/images/niwilogo.jpg' %}");
+        background-size: cover;
+        background-position: center;
+    }
+
+    /* Styles for the form */
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f7f7f7;
+        margin: 0;
+        padding: 0;
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+    }
+
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #007BFF;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    tr:hover {
+        background-color: #ddd;
+    }
+    /* Style for the search form container */
+.search-form {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Style for the search input field */
+.search-input {
+    width: 200px;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+/* Style for the search button */
+.search-button {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Style for the search button on hover */
+.search-button:hover {
+    background-color: #0056b3;
+}
+.navbar {
+    background-color: #007BFF; /* Set your desired background color */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for separation */
+}
+
+/* Style for the h1 in the navbar */
+.navbar h1 {
+    margin: 0;
+    font-size: 24px; /* Adjust the font size */
+}
+
+/* Style for the p in the navbar */
+.navbar p {
+    margin: 0;
+    font-size: 16px; /* Adjust the font size */
+}
+</style>
+<body>
+    <div class="sidebar">
+        <div class="profile-picture"></div>
+        <a href="/admins" id="logout-link">Home</a>
+        <a href="/admin_custom_package">Custom Packages</a>  
+        <a href="/logout" id="logout-link">Logout</a> 
+
+    </div>
+    <div class="navbar">
+        <h1>Welcome Admin</h1>
+        <p>This is where you can manage users, packages, and ongoing trips.</p>
+    </div>
+    <div class="main-content">
+        <h2>View Travel Packages</h2>
+        {% if categorized_packages %}
+            {% for category, packages in categorized_packages.items %}
+                <h3>{{ category }}</h3>
+                {% if packages %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Package ID</th>
+                                <th>Name</th>
+                                <th>Days</th>
+                                <th>Nights</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for package in packages %}
+                                <tr>
+                                    <td>{{ package.id }}</td>
+                                    <td>{{ package.name }}</td>
+                                    <td>{{ package.days }}</td>
+                                    <td>{{ package.nights }}</td>
+                                    <td>{{ package.price }}</td>
+                                    <td>{{ package.status }}</td>
+                                    <td>
+                                        <a href="{% url 'edit_custom_package' package.id %}">Edit</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if packages.has_other_pages %}
+                        <div class="pagination">
+                            <span class="step-links">
+                                {% if packages.has_previous %}
+                                    <a href="?page=1">&laquo; first</a>
+                                    <a href="?page={{ packages.previous_page_number }}">previous</a>
+                                {% endif %}
+                                
+                                <span class="current">
+                                    Page {{ packages.number }} of {{ packages.paginator.num_pages }}.
+                                </span>
+                                
+                                {% if packages.has_next %}
+                                    <a href="?page={{ packages.next_page_number }}">next</a>
+                                    <a href="?page={{ packages.paginator.num_pages }}">last &raquo;</a>
+                                {% endif %}
+                            </span>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <p>No travel packages available in this category.</p>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <p>No travel packages available.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

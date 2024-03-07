@@ -1,0 +1,281 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Travel Package</title>
+    <!-- Include any CSS stylesheets or JavaScript files here -->
+</head>
+<style>
+    .sidebar {
+        background-color: #113156;
+        color: white;
+        position: fixed;
+        width: 250px;
+        height: 100%;
+        top: 0;
+        left: 0;
+        padding-top: 20px;
+    }
+
+    .sidebar a {
+        color: white;
+        text-decoration: none;
+        display: block;
+        padding: 15px;
+        font-size: 18px;
+        transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+        background-color: #cd1100;
+    }
+
+    .main-content {
+        margin-left: 250px;
+        padding: 20px;
+    }
+
+    /* Styling for the profile picture */
+    .profile-picture {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 20px auto;
+        background-color: #fff;
+        background-image: url("{% static 'Niwi_Travels/images/niwilogo.jpg' %}");
+        background-size: cover;
+        background-position: center;
+    }
+
+    /* Styles for the form */
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f7f7f7;
+        margin: 0;
+        padding: 0;
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+    }
+
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #007BFF;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    tr:hover {
+        background-color: #ddd;
+    }
+    /* Style for the search form container */
+.search-form {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Style for the search input field */
+.search-input {
+    width: 200px;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+/* Style for the search button */
+.search-button {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Style for the search button on hover */
+.search-button:hover {
+    background-color: #0056b3;
+}
+.navbar {
+    background-color: #007BFF; /* Set your desired background color */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for separation */
+}
+
+/* Style for the h1 in the navbar */
+.navbar h1 {
+    margin: 0;
+    font-size: 24px; /* Adjust the font size */
+}
+
+/* Style for the p in the navbar */
+.navbar p {
+    margin: 0;
+    font-size: 16px; /* Adjust the font size */
+}
+</style>
+<body>
+    <div class="sidebar">
+        <div class="profile-picture"></div>
+        <a href="/admins" id="logout-link">Home</a>
+        <a href="{% url 'user_list' %}">Users </a>  
+        <a href="/travellers">Travellers</a>
+        <a href="/drivers">Drivers</a> 
+        <a href="/upload_package">Add Package</a>
+        <a href="/view-packages">View Package</a>
+        <a href="/bookings">Verification Requests</a>
+        <a href="/verified_bookings">Verified Bookings</a>
+        <a href="/ongoing-bookings" id="logout-link">Ongoing Journeys</a>
+        <a href="/history-bookings">History Journeys</a>
+        <a href="/logout" id="logout-link">Logout</a> 
+
+    </div>
+    <div class="navbar">
+        <h1>Welcome Admin</h1>
+        <p>This is where you can manage users, packages, and ongoing trips.</p>
+    </div>
+    <div class="main-content">
+    <h2>View Travel Packages</h2>
+    <h3>Running Packages</h3>
+    <table class="table">
+        <form method="get" class="search-form">
+            <input type="date" name="search_date" placeholder="Search by start date" class="search-input">
+            <button type="submit" class="search-button">Search By Date</button>
+        </form>
+        <thead>
+            <tr>
+                <th>Package ID</th>
+                <th>Package Name</th>
+                <th>Destination</th>
+                <th>Price</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <th>Feed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for package in running_packages %}
+            <tr>
+                    <td>{{ package.id }}</td>
+                    <td>{{ package.package_name }}</td>
+                    <td>{{ package.destination }}</td>
+                    <td>{{ package.price }}</td>
+                    <td>{{ package.start_date }}</td>
+                    <td>{{ package.end_date }}</td>
+                    <td>{{ package.status }}</td>
+                    <td>{{ package.feed }}</td>
+  
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7">No travel packages available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="7">
+                    <div class="pagination">
+                        <span class="step-links">
+                            {% if running_packages.has_previous %}
+                                <a href="?page_running=1">&laquo; first</a>
+                                <a href="?page_running={{ running_packages.previous_page_number }}">previous</a>
+                            {% endif %}
+                    
+                            <span class="current-page">Page {{ running_packages.number }} of {{ running_packages.paginator.num_pages }}.</span>
+                    
+                            {% if running_packages.has_next %}
+                                <a href="?page_running={{ running_packages.next_page_number }}">next</a>
+                                <a href="?page_running={{ running_packages.paginator.num_pages }}">last &raquo;</a>
+                            {% endif %}
+                        </span>
+                    </div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    <h3>Paused Packages</h3>
+    <table class="table">
+        <form method="get" class="search-form">
+            <input type="date" name="search_date" placeholder="Search by start date" class="search-input">
+            <button type="submit" class="search-button">Search By Date</button>
+        </form>
+        <thead>
+            <tr>
+                <th>Package ID</th>
+                <th>Package Name</th>
+                <th>Destination</th>
+                <th>Price</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <th>Feed</th>
+                <th>Action</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for package in paused_packages %}
+            <tr>
+                    <td>{{ package.id }}</td>
+                    <td>{{ package.package_name }}</td>
+                    <td>{{ package.destination }}</td>
+                    <td>{{ package.price }}</td>
+                    <td>{{ package.start_date }}</td>
+                    <td>{{ package.end_date }}</td>
+                    <td>{{ package.status }}</td>
+                    <td>{{ package.feed }}</td>
+                    <td>
+                        <a href="{% url 'edit_package' package.id %}" class="edit-button">Edit</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7">No travel packages available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="7">
+                    <div class="pagination">
+                        <span class="step-links">
+                            {% if paused_packages.has_previous %}
+                                <a href="?page_paused=1">&laquo; first</a>
+                                <a href="?page_paused={{ paused_packages.previous_page_number }}">previous</a>
+                            {% endif %}
+                    
+                            <span class="current-page">Page {{ paused_packages.number }} of {{ paused_packages.paginator.num_pages }}.</span>
+                    
+                            {% if paused_packages.has_next %}
+                                <a href="?page_paused={{ paused_packages.next_page_number }}">next</a>
+                                <a href="?page_paused={{ paused_packages.paginator.num_pages }}">last &raquo;</a>
+                            {% endif %}
+                        </span>
+                    </div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>

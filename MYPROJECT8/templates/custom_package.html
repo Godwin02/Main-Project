@@ -1,0 +1,467 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Travel Package</title>
+    <!-- Include any CSS stylesheets or JavaScript files here -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+</head>
+<style>
+.sidebar {
+    background-color: #113156;
+    color: white;
+    position: fixed;
+    width: 250px;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding-top: 20px;
+    overflow-y: hidden; /* Hide the main scrollbar in the sidebar */
+}
+    .sidebar a {
+        color: white;
+        text-decoration: none;
+        display: block;
+        padding: 15px;
+        font-size: 18px;
+        transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+        background-color: #cd1100;
+    }
+
+    .main-content {
+    margin-left: 250px;
+    padding: 20px;
+    overflow-y: auto; /* Enable vertical scrollbar for the main content */
+}
+
+    /* Styling for the profile picture */
+    .profile-picture {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 20px auto;
+        background-color: #fff;
+        background-image: url("{% static 'Niwi_Travels/images/niwilogo.jpg' %}");
+        background-size: cover;
+        background-position: center;
+    }
+
+    /* Styles for the form */
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f7f7f7;
+        margin: 0;
+        padding: 0;
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+    }
+
+    .package-form {
+        width: 60%;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+        width: 100%;
+    }
+
+    .form-group {
+        margin: 10px 0;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="url"],
+    textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    textarea {
+        height: 100px;
+    }
+    select#accommodation {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    /* Add this CSS to style the options within the "Status" dropdown */
+    select#accommodation option {
+        background-color: #fff;
+        color: #333;
+    }
+    select#status {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    /* Add this CSS to style the options within the "Status" dropdown */
+    select#status option {
+        background-color: #fff;
+        color: #333;
+    }
+
+
+    .submit-button {
+        background-color: #007BFF;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .submit-button:hover {
+        background-color: #0056b3;
+    }
+    .navbar {
+    background-color: #007BFF; /* Set your desired background color */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for separation */
+}
+
+/* Style for the h1 in the navbar */
+.navbar h1 {
+    margin: 0;
+    font-size: 24px; /* Adjust the font size */
+}
+
+/* Style for the p in the navbar */
+.navbar p {
+    margin: 0;
+    font-size: 16px; /* Adjust the font size */
+}
+.scrollable-content {
+    height: calc(100% - 20px); /* Adjust the height as needed */
+    overflow-y: auto; /* Enable vertical scrollbar for the scrollable content */
+}
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+input[type="submit"] {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+</style>
+<body>
+    <div class="sidebar">
+        <div class="scrollable-content">
+
+        <div class="profile-picture"></div>
+        <a href="/admins" id="logout-link">Home</a>
+        <a href="/admin_custom_package">Custom Packages</a>
+        <a href="/logout" id="logout-link">Logout</a> 
+        </div>
+    </div>
+    <div class="navbar">
+        <h1>Welcome Admin</h1>
+        <p>This is where you can manage users, packages, and ongoing trips.</p>
+    </div>
+    <div class="main-content">
+        <h2>Create Custom Package</h2>
+    
+        <form method="post" action="{% url 'custom_package' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+    
+            <!-- Travel Package Information -->
+            <div class="package-form">
+                <h3>Travel Package Information</h3>
+                <!-- Display form errors if any -->
+                {{ travel_package_form.non_field_errors }}
+                <div class="form-group">
+                    <label for="id_category">Category:</label>
+                    <select name="category" id="id_category">
+                        <option value="" selected disabled>Select a category</option>
+                        <option value="Honeymoon">Honeymoon</option>
+                        <option value="Adventure">Adventure</option>
+                        <option value="Family">Family</option>
+                    </select>
+                    <div id="id_category-alert" class="alert alert-danger"></div>
+                </div>
+                <div class="form-group">
+                    <label for="id_name">Name:</label>
+                    <input type="text" name="name" id="id_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_description">Description:</label>
+                    <textarea name="description" id="id_description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="id_days">Days:</label>
+                    <input type="number" name="days" id="id_days" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_nights">Nights:</label>
+                    <input type="number" name="nights" id="id_nights" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_price">Price:</label>
+                    <input type="number" name="price" id="id_price" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_package_image">Package Image:</label>
+                    <input type="file" name="package_image" id="id_package_image" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label for="id_status">Status:</label>
+                    <select name="status" id="id_status">
+                        <option value="" selected disabled>Select a status</option>
+                        <option value="Post">Post</option>
+                        <option value="Save">Save</option>
+                    </select>
+                    <div id="id_status-alert" class="alert alert-danger"></div>
+                </div>
+            </div>
+    
+            <!-- Days Information -->
+            <div class="package-form" id="days-information">
+                <h3>Days Information</h3>
+                <div class="formset-form">
+                    <div class="form-group">
+                        <label for="day_image_1">Day 1 Image:</label>
+                        <input type="file" name="day_image_1" id="day_image_1" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="day_image_description_1">Day 1 Image Description:</label>
+                        <textarea name="day_image_description_1" id="day_image_description_1" required></textarea>
+                    </div>
+                </div>
+                <!-- Add more day information fields as needed -->
+            </div>
+
+    
+            <input type="submit" value="Create Package">
+        </form>
+    </div>
+    
+    
+    <script>
+        // Function to generate dynamic fields
+        function generateDynamicFields() {
+            // Clear existing dynamic fields
+            $('#days-information').empty();
+    
+            // Get the number of days from the days form field
+            var numberOfDays = $('#id_days').val();
+    
+            // Generate fields for each day
+            for (var i = 1; i <= numberOfDays; i++) {
+                var dynamicFieldHTML = `
+                    <div class="formset-form">
+                        <div class="form-group">
+                            <label for="day_image_${i}">Day ${i} Image:</label>
+                            <input type="file" name="day_image_${i}" id="day_image_${i}" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <label for="day_image_description_${i}">Day ${i} Image Description:</label>
+                            <textarea name="day_image_description_${i}" id="day_image_description_${i}" required></textarea>
+                        </div>
+                    </div>
+                `;
+                $('#days-information').append(dynamicFieldHTML);
+            }
+        }
+    
+        // Attach the function to the change event of the days input field
+        $('#id_days').on('change', generateDynamicFields);
+    
+        // Initial generation on page load
+        generateDynamicFields();
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get form elements
+            var form = document.querySelector('form');
+            var nameInput = document.getElementById('id_name');
+            var descriptionTextarea = document.getElementById('id_description');
+            var daysInput = document.getElementById('id_days');
+            var nightsInput = document.getElementById('id_nights');
+            var priceInput = document.getElementById('id_price');
+            var categorySelect = document.getElementById('id_category');
+            var statusSelect = document.getElementById('id_status');
+
+            form.addEventListener('submit', function (event) {
+                if (!validateForm()) {
+                    event.preventDefault();
+                    // Optionally, display a message or highlight fields with errors
+                }
+            });
+    
+            nameInput.addEventListener('input', validateName);
+            descriptionTextarea.addEventListener('input', validateDescription);
+            daysInput.addEventListener('input', validateDays);
+            nightsInput.addEventListener('input', validateNights);
+            priceInput.addEventListener('input', validatePrice);
+            categorySelect.addEventListener('change', validateCategory);
+            statusSelect.addEventListener('change', validateStatus);
+
+            function validateForm() {
+                var isValid = true;
+    
+                // Example: Validate name
+                isValid = isValid && validateName();
+    
+                // Example: Validate description
+                isValid = isValid && validateDescription();
+    
+                // Example: Validate days
+                isValid = isValid && validateDays();
+    
+                // Example: Validate nights
+                isValid = isValid && validateNights();
+    
+                // Example: Validate price
+                isValid = isValid && validatePrice();
+    
+                // Example: Validate category
+                isValid = isValid && validateCategory();
+                
+                isValid = isValid && validateStatus();
+
+                return isValid;
+            }
+    
+            function validateName() {
+                var nameValue = nameInput.value.trim();
+                if (nameValue === '') {
+                    showAlert(nameInput, 'Name cannot be empty');
+                    return false;
+                } else {
+                    hideAlert(nameInput);
+                    return true;
+                }
+            }
+    
+            function validateDescription() {
+                var descriptionValue = descriptionTextarea.value.trim();
+                if (descriptionValue === '') {
+                    showAlert(descriptionTextarea, 'Description cannot be empty');
+                    return false;
+                } else {
+                    hideAlert(descriptionTextarea);
+                    return true;
+                }
+            }
+    
+            function validateDays() {
+                var daysValue = parseInt(daysInput.value, 10);
+                if (isNaN(daysValue) || daysValue < 1) {
+                    showAlert(daysInput, 'Days must be a positive integer');
+                    return false;
+                } else {
+                    hideAlert(daysInput);
+                    return true;
+                }
+            }
+    
+            function validateNights() {
+                var nightsValue = parseInt(nightsInput.value, 10);
+                if (isNaN(nightsValue) || nightsValue < 1) {
+                    showAlert(nightsInput, 'Nights must be a positive integer');
+                    return false;
+                } else {
+                    hideAlert(nightsInput);
+                    return true;
+                }
+            }
+    
+            function validatePrice() {
+                var priceValue = parseFloat(priceInput.value);
+                if (isNaN(priceValue) || priceValue <= 0) {
+                    showAlert(priceInput, 'Price must be a positive number');
+                    return false;
+                } else {
+                    hideAlert(priceInput);
+                    return true;
+                }
+            }
+    
+            function validateCategory() {
+                var selectedCategory = categorySelect.options[categorySelect.selectedIndex].value;
+                if (selectedCategory === '') {
+                    showAlert(categorySelect, 'Please select a category');
+                    return false;
+                } else {
+                    hideAlert(categorySelect);
+                    return true;
+                }
+            }
+            function validateStatus() {
+                    var selectedStatus = statusSelect.options[statusSelect.selectedIndex].value;
+                    var alertElement = document.getElementById('id_status-alert');
+
+                    if (selectedStatus === '') {
+                        alertElement.textContent = 'Please select a status';
+                        statusSelect.classList.add('is-invalid');
+                        return false;
+                    } else {
+                        alertElement.textContent = '';
+                        statusSelect.classList.remove('is-invalid');
+                        return true;
+                    }
+                }
+                
+            function showAlert(inputElement, message) {
+                var alertId = inputElement.id + '-alert';
+                var alertElement = document.getElementById(alertId);
+    
+                if (!alertElement) {
+                    alertElement = document.createElement('div');
+                    alertElement.id = alertId;
+                    alertElement.classList.add('alert', 'alert-danger');
+                    inputElement.parentNode.appendChild(alertElement);
+                }
+    
+                alertElement.textContent = message;
+            }
+    
+            function hideAlert(inputElement) {
+                var alertId = inputElement.id + '-alert';
+                var alertElement = document.getElementById(alertId);
+    
+                if (alertElement) {
+                    alertElement.parentNode.removeChild(alertElement);
+                }
+            }
+        });
+    </script>
+</body>
+</html>    

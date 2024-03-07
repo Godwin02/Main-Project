@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5; /* Set background color */
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        .receipt-container {
+            width: 80%;
+            margin: auto;
+            background-color: #fff; /* Set container background color */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+            text-align: center;
+            color: #333; /* Set text color */
+            min-height: 100%;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #0066cc; /* Set header text color */
+        }
+
+        .info {
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        .info p {
+            margin: 2px 0; /* Adjust the margin between each line */
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            background-color: #f5f5f5; /* Set footer background color */
+            color: #777; /* Set footer text color */
+        }
+
+        .logo {
+            float: right;
+            max-width: 100px; /* Set the maximum width for the logo */
+            margin-top: -30px; /* Adjust the margin to position the logo */
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt-container">
+        <img src="{% static 'Niwi_Travels/images/niwilogo.jpg' %}" alt="Logo" class="logo">
+        <div class="header">
+            <h2>NIWI TRAVELS</h2>
+        </div>
+        <div class="info">
+            <p style="text-align: center;"><strong>User Details</strong></p>
+            <p><strong>Name:</strong> {{ user_details.first_name }} {{ user_details.last_name }}</p>
+            <p><strong>Phone Number:</strong> {{ user_details.phone_number }}</p>
+            <p><strong>Number of Passengers for {{ booking.package.package_name }} :</strong>{{ passengers.count }}</p>
+            
+            <p style="text-align: center;"><strong>Package Details</strong></p>
+            <p><strong>Destination:</strong> {{ booking.package.destination }}</p>
+            <p><strong>Start Date:</strong> {{ booking.package.start_date }}</p>
+            
+            <p style="text-align: center;"><strong>Payment Details</strong></p>
+            <p><strong>Booking ID:</strong>{{ booking.id }}</p>
+            <p><strong>Amount Paid:</strong> {{ payment.amount }}</p>
+            <!-- Add more payment fields as needed -->
+        </div>
+        <div class="footer">
+            <p>Thank You for Booking with Niwi Travels!</p>
+            <p>For any Queries feel free to Contact Niwi Travels: godwinbmenachery2024a@mca.ajce.in | 8078152909 </p>
+        </div>
+    </div>
+</body>
+</html>

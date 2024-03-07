@@ -1,0 +1,140 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>NIWITRAVELS</title>
+        <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+        <link rel="stylesheet" href="{% static 'Niwi_Travels/css/style.css' %}">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+        <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+        <style>
+            /* Add custom CSS styles here */
+            .container {
+            margin-top: 80px; /* Adjust the top margin to control the space below the navbar */
+        }
+
+        .profile-table {
+            width: 100%;
+            max-width: 800px; /* Set a maximum width for the table */
+            margin: 0 auto; /* Center the table horizontally */
+            border-collapse: collapse;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-table th, .profile-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .profile-table th {
+            background-color: #050505;
+            color: #fff;
+        }
+
+        .profile-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .profile-table tr:hover {
+            background-color: #ddd;
+        }
+
+        .profile-table img {
+            max-width: 100px; /* Limit the width of profile photos */
+            height: auto;
+            display: block;
+            margin: 0 auto; /* Center the profile photos */
+        }
+
+        .text-dark {
+            color: #000000; /* Dark text color */
+        }
+        </style>
+        
+      </head>
+      <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+    
+        <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light site-navbar-target" id="ftco-navbar">
+            <div class="container">
+                <img src="{% static 'Niwi_Travels/images/niwilogo.jpg' %}" alt="Logo" width="40px" height="35px"> <a class="navbar-brand" href="#">NIWI TRAVELS</a>
+
+    
+              <div class="collapse navbar-collapse" id="ftco-nav">
+                <ul class="navbar-nav nav ml-auto">
+                    
+                  <li class="nav-item"><a href="/thome" class="nav-link"><span style="color: #fff;">Home</span></a></li>
+                  <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" style="color: #fff;">
+                        {{ user.username }}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="/upcoming-journeys" id="#" style=" background-color: rgb(42, 165, 67);text-align: center;margin-top: 10px">Upcoming Journeys</a>
+                        <a class="dropdown-item" href="/ongoing-journeys" id="#" style=" background-color: rgb(218, 180, 13);text-align: center;margin-top: 10px">Ongoing Trips</a>
+                        <a class="dropdown-item" href="/history-journeys" id="#" style=" background-color: rgb(234, 0, 0);text-align: center;margin-top: 10px">History</a>
+                        <a class="dropdown-item" href="/viewprofileT" style=" background-color: rgb(151, 140, 245);text-align: center;margin-top: 10px">View Profile</a>
+                        <a class="dropdown-item" href="/tupdate" id="#" style=" background-color: rgb(195, 67, 172);text-align: center;margin-top: 10px">Update Profile</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/logout" id="logout-link" style="color: rgb(255, 0, 0); background-color: rgb(40, 38, 38); text-align: center;margin-top: 10px">Logout</a>
+                    </div>
+                </li>
+                </ul>
+                
+              </div>
+            </div>
+          </nav>
+
+<div class="container">
+    <h2 class="text-center">View Profile</h2>
+    <table class="profile-table">
+        <tr>
+            <td class="text-dark"><label for="username">Username:</label></td>
+            <td class="text-dark">{{ user_details.username }}</td>
+        </tr>
+        <tr>
+            <td class="text-dark"><label for="email">Email:</label></td>
+            <td class="text-dark">{{ user_details.email }}</td>
+        </tr>
+        <tr>
+            <td class="text-dark"><label for="first_name">First Name:</label></td>
+            <td class="text-dark">{{ profile.first_name }}</td>
+        </tr>
+        <tr>
+            <td class="text-dark"><label for="last_name">Last Name:</label></td>
+            <td class="text-dark">{{profile.last_name }}  {{ user_details.last_name }}</td>
+        </tr>
+        <tr>
+            <td><label for="phone_number">Phone Number:</label></td>
+            <td>{{ profile.phone_number }}</td>
+        </tr>
+        <tr>
+            <td class="text-dark"><label for="country">Country:</label></td>
+            <td class="text-dark">{{ profile.country }}</td>
+        </tr>
+        <tr>
+            <td class="text-dark"><label for="gender">Gender:</label></td>
+            <td class="text-dark">{{ profile.gender }}</td>
+        </tr>
+        <tr>
+            <td class="text-dark"><label for="profile_photo">Profile Photo:</label></td>
+            <td >
+                {% if profile.profile_photo %}
+                    <img src="{{ profile.profile_photo.url }}" alt="Profile Photo">
+                {% else %}
+                    No profile photo available.
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

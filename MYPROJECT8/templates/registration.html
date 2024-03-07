@@ -1,0 +1,442 @@
+{% load static %}
+
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>NIWI TRAVELS</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Cormorant+Garamond:300,300i,400,400i,500,500i,600,600i,700,700i"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'Niwi_Travels/css/open-iconic-bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'Niwi_Travels/css/animate.css' %}">
+
+    <link rel="stylesheet" href="{% static 'Niwi_Travels/css/owl.carousel.min.css' %}">
+    <link rel="stylesheet" href="{% static 'Niwi_Travels/css/owl.theme.default.min.css' %}">
+    <link rel="stylesheet" href="{% static 'Niwi_Travels/css/magnific-popup.css' %}">
+
+    <link rel="stylesheet" href="{% static 'Niwi_Travels/css/aos.css' %}">
+
+    <link rel="stylesheet" href="{% static 'Niwi_Travels/css/ionicons.min.css' %}">
+
+    <link rel="stylesheet" href="{% static 'Niwi_Travels/css/flaticon.css' %}">
+    <link rel="stylesheet" href="{% static 'Niwi_Travels/css/icomoon.css' %}">
+    <link rel="stylesheet" href="{% static 'Niwi_Travels/css/style.css' %}">
+    <style>
+        .container {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+   
+</head>
+<body style="background-image: url('{% static 'Niwi_Travels/images/bg_4.jpg' %}');">
+    <div class="container">
+        <div class="col-lg-6 pb-5 bg-light">
+            <div class="search-wrap-10 ftco-animate">
+                <center><h2 class="mb-3">Enter Your Details to Register</h2></center>
+                <form action="#" class="search-property-1" id="forms">
+                    <div class="row">
+                        <div class="col-lg-12 align-items-end mb-3">
+                            <div class="form-group">
+                                <label for="#">Username</label>
+                                <div class="form-field">
+                                    <div class="icon"><span class="ion-ios-search"></span></div>
+                                    <input type="text" class="form-control" placeholder="Enter your name here">
+                                    <div id="username-validation-message" class="validation-message"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 align-items-end mb-3">
+                            <div class="form-group">
+                                <label for="#">User Type</label>
+                                <span id="usertype-validation-message" class="validation-message"></span>
+                                <div class="form-field">
+                                    <div class="select-wrap">
+                                        <select name="" id="" class="form-control">
+                                            <option value="">Choose</option>
+                                            <option value="">Traveller</option>
+                                            <option value="">Driver</option>
+                                            <option value="">Admin</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 align-items-end mb-3">
+                            <div class="form-group">
+                                <label for="#">Email</label>
+                                <span id="email-validation-message" class="validation-message"></span>
+                                <div class="form-field">
+                                    <div class="icon"></div>
+                                    <input type="email" class="form-control" placeholder="Enter your Email-id">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 align-items-end mb-3">
+                            <div class="form-group">
+                                <label for="#">Password</label>
+                                <span id="password-validation-message" class="validation-message"></span>
+                                <div class="form-field">
+                                    <div class="icon"></div>
+                                    <input type="password" class="form-control" placeholder="Create a password">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 align-items-end mb-3">
+                            <div class="form-group">
+                                <label for="#">Confirm Password</label>
+                                <span id="confirm-password-validation-message" class="validation-message"></span>
+                                <div class="form-field">
+                                    <div class="icon"></div>
+                                    <input type="password" class="form-control" placeholder="Create a password">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-12 align-self-end">
+                            <div class="form-group">
+                                <div class="form-field">
+                                    <a href='home'><input type="submit" value="Register" class="form-control btn btn-primary"></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'Niwi_Travels/js/jquery.min.js' %}"></script>
+    <script src="{% static 'Niwi_Travels/js/jquery-migrate-3.0.1.min.js' %}"></script>
+    <script src="{% static 'Niwi_Travels/js/popper.min.js' %}"></script>
+    <script src="{% static 'Niwi_Travels/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'Niwi_Travels/js/jquery.easing.1.3.js' %}"></script>
+    <script src="{% static 'Niwi_Travels/js/jquery.waypoints.min.js' %}"></script>
+    <script src="{% static 'Niwi_Travels/js/jquery.stellar.min.js' %}"></script>
+    <script src="{% static 'Niwi_Travels/js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'Niwi_Travels/js/jquery.magnific-popup.min.js' %}"></script>
+    <script src="{% static 'Niwi_Travels/js/aos.js' %}"></script>
+    <script src="{% static 'Niwi_Travels/js/jquery.animateNumber.min.js' %}"></script>
+    <script src="{% static 'Niwi_Travels/js/scrollax.min.js' %}"></script>
+
+    <script src="{% static 'Niwi_Travels/js/main.js' %}"></script>
+
+
+	
+	<script src="{% static 'Niwi_Travels/js/your-validation-script.js' %}"></script>
+
+</body>
+</html>
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+
+    <style>
+             .navbar {
+            background-color: #113156;
+            color: white;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 30px 80px;
+            transition: color 0.3s, text-decoration 0.3s ; /* Smooth transition for text color */
+        }
+
+        .navbar a:hover {
+            color: #cd1100; /* Text color on hover */
+            text-decoration: underline;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            background-image: url("{% static 'Niwi_Travels/images/bg_4.jpg' %}");
+        }
+
+        .registration-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .registration-container h2 {
+            margin-bottom: 20px;
+        }
+
+        .registration-container input[type="text"],
+        .registration-container input[type="email"],
+        .registration-container input[type="password"],
+        .registration-container select {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            border-radius: 4px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .registration-container input[type="text"]:hover,
+        .registration-container input[type="email"]:hover,
+        .registration-container input[type="password"]:hover,
+        .registration-container select:hover {
+            border-color: #007BFF;
+        }
+
+        .registration-container .validation-message {
+            color: red;
+            margin-top: 4px;
+        }
+
+        .registration-container button {
+            background-color: #007BFF;
+            color: white;
+            padding: 14px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .registration-container button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsive design */
+        @media screen and (max-width: 480px) {
+            .registration-container {
+                width: 90%;
+                padding: 15px;
+            }
+        }
+        
+        /* Style labels */
+        .registration-container label {
+            font-weight: bold;
+            font-size: 16px;
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            color: #333;
+        }
+    </style>
+<link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Cormorant+Garamond:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="/home">HOME</a>
+        <a href="#">NIWITRAVELS</a>
+        <a href="#">ABOUT</a>
+        <a href="#">SERVICES</a>
+        <a href="des">DESTINATION</a>
+        <a href="/log">LOGIN</a>
+    </div>
+
+
+<div class="registration-container">
+    <h2>Registration</h2>
+    {% if messages %}
+        <div class="error_message">
+            <ul class="messages">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    <form action="#" method="post" id="forms">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username-input" placeholder="Create a Username" required>
+            <div id="username-validation-message" class="validation-message"></div>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+       
+            <input type="email" name="email" id="email-input" placeholder="Enter your Email-Id" required>
+            <div id="email-validation-message" class="validation-message">
+            </div>
+        </div>
+        <div class="col-lg-12 align-items-end mb-3">
+            <div class="form-group">
+                <label for="{{ form.usertype.id_for_label }}">User Type</label>
+                <span id="usertype-validation-message" class="validation-message"></span>
+                {{ form.user_type }}
+            
+                <!-- <div class="form-field">
+                    <div class="select-wrap">
+                        <select name="" id="" class="form-control">
+                            <option value="">Choose</option>
+                            <option value="">Traveller</option>
+                            <option value="">Driver</option>
+                        </select>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+
+        <div id="integrity-error-message" class="error_message"></div>   
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password-input" placeholder="Create a password" required>
+            <div id="password-validation-message" class="validation-message"></div>
+        </div>
+        <div class="form-group">
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" name="confirm_password" id="confirm-password-input" placeholder="Confirm Password" required>
+            <div id="confirm-password-validation-message" class="validation-message"></div>
+        </div>
+        <button >Register</button>
+    </form>
+</div>
+    <script>
+    // Get references to the validation message elements
+    const usernameValidationMessage = document.getElementById('username-validation-message');
+    const usertypeValidationMessage = document.getElementById('usertype-validation-message');
+    const emailValidationMessage = document.getElementById('email-validation-message');
+    const passwordValidationMessage = document.getElementById('password-validation-message');
+    const confirmPasswordValidationMessage = document.getElementById('confirm-password-validation-message');
+    //
+    const integrityErrorMessage = document.getElementById('integrity-error-message');
+
+    // Get references to form fields
+    const usernameInput = document.getElementById('username-input');
+    const userTypeInput = document.getElementById('usertype-input');
+    const emailInput = document.getElementById('email-input');
+    const passwordInput = document.getElementById('password-input');
+    const confirmPasswordInput = document.getElementById('confirm-password-input');
+
+    // Validate username (no whitespace, only underscores allowed)
+    usernameInput.addEventListener('input', () => {
+        const usernameValue = usernameInput.value.trim();
+        if (usernameValue === '') {
+            usernameValidationMessage.textContent = 'Please enter your name.';
+        } else if (/\s/.test(usernameValue)) {
+            usernameValidationMessage.textContent = 'Username cannot contain spaces.';
+        } else if (!/^[a-zA-Z0-9_]*$/.test(usernameValue)) {
+            usernameValidationMessage.textContent = 'Username can only contain letters, numbers, and underscores.';
+        } else {
+            usernameValidationMessage.textContent = '';
+        }
+    });
+
+    // Validate user type
+
+    // Validate email
+    emailInput.addEventListener('input', () => {
+        const emailValue = emailInput.value.trim();
+        if (emailValue === '') {
+            emailValidationMessage.textContent = 'Please enter your email.';
+        } else if (!/^\S+@\S+\.\S+$/.test(emailValue)) {
+            emailValidationMessage.textContent = 'Please enter a valid email address.';
+        } else if (/\.com\.com/.test(emailValue)) {
+            emailValidationMessage.textContent = 'Repeated ".com" is not allowed in the email.';
+        } else {
+            emailValidationMessage.textContent = '';
+        }
+    });
+    
+
+        // Validate password
+ passwordInput.addEventListener('input', () => {
+    const passwordValue = passwordInput.value;
+    const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/;
+    if (!passwordPattern.test(passwordValue)) {
+        passwordValidationMessage.textContent = 'Password must contain at least one numeric digit, one uppercase letter, one lowercase letter, and one special character, and be at least 8 characters long';
+    } else {
+        passwordValidationMessage.textContent = '';
+    }
+});
+
+
+    // Validate confirm password
+    confirmPasswordInput.addEventListener('input', () => {
+        const confirmPasswordValue = confirmPasswordInput.value;
+        const passwordValue = passwordInput.value;
+        if (confirmPasswordValue === '') {
+            confirmPasswordValidationMessage.textContent = 'Please confirm your password.';
+        } else if (confirmPasswordValue !== passwordValue) {
+            confirmPasswordValidationMessage.textContent = 'Passwords do not match.';
+        } else {
+            confirmPasswordValidationMessage.textContent = '';
+        }
+
+
+
+
+
+        
+    });
+
+    // Get a reference to the form
+    const form = document.getElementById('forms');
+
+    // Function to validate the form on submit
+    function validateForm(event) {
+        // Prevent form submission initially
+        event.preventDefault();
+
+        // Check if all validation messages are empty
+        if (
+        usernameValidationMessage.textContent ||
+        emailValidationMessage.textContent ||
+        passwordValidationMessage.textContent ||
+        confirmPasswordValidationMessage.textContent
+    ) {
+        // Display a general error message if there are validation errors
+        alert('Please fix the form errors before submitting.');
+    } else {
+        // Submit the form if there are no errors
+        form.submit();
+    }
+}
+
+    // Attach the validateForm function to the form's submit event
+    form.addEventListener('submit', validateForm);
+    </script>
+
+</body>
+</html>

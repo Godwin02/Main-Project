@@ -1,0 +1,117 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+
+    <!-- Add your CSS stylesheets and JavaScript files here -->
+    <style>
+        /* Basic styling for the sidebar */
+        .sidebar {
+            background-color: #113156;
+            color: white;
+            position: fixed;
+            width: 250px;
+            height: 100%;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 15px; /* Increase padding to make the links larger */
+            font-size: 18px; /* Increase font size for links */
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #cd1100;
+        }
+
+        /* Styling for the profile picture */
+        .profile-picture {
+            width: 120px; /* Increase the profile picture size */
+            height: 120px; /* Increase the profile picture size */
+            border-radius: 50%;
+            margin: 20px auto;
+            background-color: #fff;
+            background-image: url("{% static 'Niwi_Travels/images/niwilogo.jpg' %}");
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Adjust main content to account for the sidebar */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .navbar {
+    background-color: #007BFF; /* Set your desired background color */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for separation */
+}
+
+/* Style for the h1 in the navbar */
+.navbar h1 {
+    margin: 0;
+    font-size: 24px; /* Adjust the font size */
+}
+
+/* Style for the p in the navbar */
+.navbar p {
+    margin: 0;
+    font-size: 16px; /* Adjust the font size */
+}
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="profile-picture"></div>
+        <a href="{% url 'user_list' %}">Users </a>  
+        <a href="/travellers">Travellers</a>
+        <a href="/drivers">Drivers</a> 
+        <a href="/upload_package">Add Package</a>
+        <a href="/admin_custom_package">Custom Packages</a>
+        <a href="/view-packages">View Package</a>
+        <a href="/bookings">Verification Requests</a>
+        <a href="/verified_bookings">Verified Bookings</a>
+        <a href="/ongoing-bookings" id="logout-link">Ongoing Journeys</a>
+        <a href="/history-bookings">History Journeys</a>
+        <a href="/logout" id="logout-link">Logout</a>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="navbar">
+        <h1>Welcome Admin</h1>
+        <p>This is where you can manage users, packages, and ongoing trips.</p>
+    </div>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <script>
+        // Wait for the document to be fully loaded
+        document.addEventListener("DOMContentLoaded", function () {
+            // Find the logout button by its ID
+            var logoutButton = document.getElementById("logout-link");
+    
+            // Add a click event listener to the logout button
+            logoutButton.addEventListener("click", function () {
+                // Reload the page after a short delay (you can adjust the delay as needed)
+                setTimeout(function () {
+                    location.reload();
+                }, 1000); // Reload after 1 second (1000 milliseconds)
+            });
+        });
+    </script>
+    <!-- Add your JavaScript scripts here, if needed -->
+</body>
+</html>

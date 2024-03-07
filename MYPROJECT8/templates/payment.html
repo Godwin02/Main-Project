@@ -1,0 +1,210 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment</title>
+    <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'Niwi_Travels/css/style.css' %}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+<style>
+ h1 {
+            font-size: 24px;
+            text-align: center;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        /* Card styles */
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            margin-bottom: 20px;
+        }
+
+        /* Hover effect for the card */
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Image styles within the card */
+        .card-img-top {
+            width: 100%;
+            height: 200px; /* Set the desired height */
+            object-fit: cover;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        /* Card title styles */
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        /* Card text styles */
+        .card-text {
+            font-size: 1rem;
+        }
+
+        /* "No upcoming journeys found" message styles */
+        .no-journeys {
+            font-size: 1.25rem;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        h1 {
+        margin: 20px;
+        padding: 10px;
+        text-align: center;
+    }
+
+    /* Add some margin and padding for the p elements */
+    p {
+        margin: 10px;
+        padding: 5px;
+    }
+
+    /* Add some styles for the payment form */
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 20px;
+        padding: 10px;
+        border: 1px solid black;
+    }
+
+    /* Add some styles for the input elements */
+    input {
+        width: 300px;
+        height: 30px;
+        margin: 10px;
+        padding: 5px;
+        border: 1px solid gray;
+    }
+
+    /* Add some styles for the button element */
+    button {
+        width: 200px;
+        height: 40px;
+        margin: 10px;
+        padding: 10px;
+        border: none;
+        background-color: green;
+        color: white;
+        font-weight: bold;
+    }
+
+    /* Add some styles for the error messages */
+    .error {
+        color: red;
+        font-style: italic;
+    }
+    .booking-form-box {
+            background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    opacity: 0.9;
+    text-align: left;
+    max-width: 700px;
+    margin: 0 auto; /* Center the box horizontally */
+    margin-top: 10%; /
+        }
+        
+        .booking-form-box label,
+        .booking-form-box input,
+        .booking-form-box textarea {
+            display: block;
+            margin-bottom: 10px;
+            width: 600px;
+        }
+        
+        .booking-form-box textarea {
+            resize: vertical;
+        }
+        
+        .booking-form-box button {
+            background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition-duration: 0.4s;
+    text-align: center; /* Align the button text in the center */
+    display: block; /* Make the button a block element */
+    margin: 0 auto; /* Center the button horizontally */
+        }
+        
+        .booking-form-box button:hover {
+            background-color: #00b348;
+        }
+
+</style>
+</head>
+<body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+    
+    <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light site-navbar-target" id="ftco-navbar">
+        <div class="container">
+            <img src="{% static 'Niwi_Travels/images/niwilogo.jpg' %}" alt="Logo" width="40px" height="35px"> <a class="navbar-brand" href="#">NIWI TRAVELS</a>
+
+
+          <div class="collapse navbar-collapse" id="ftco-nav">
+            <ul class="navbar-nav nav ml-auto">
+                
+              <li class="nav-item"><a href="/thome" class="nav-link"><span style="color: #fff;">Home</span></a></li>
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" style="color: #fff;">
+                    {{ user.username }}
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="/upcoming-journeys" id="#" style=" background-color: rgb(42, 165, 67);text-align: center; margin-top: 10px;">Upcoming Journeys</a>
+                    <a class="dropdown-item" href="/ongoing-journeys" id="#" style=" background-color: rgb(218, 180, 13);text-align: center; margin-top: 10px;">Ongoing Trips</a>
+                    <a class="dropdown-item" href="/history-journeys" id="#" style=" background-color: rgb(234, 0, 0);text-align: center;margin-top: 10px">History</a>
+                    <a class="dropdown-item" href="/viewprofileT" style=" background-color: rgb(151, 140, 245);text-align: center;margin-top: 10px">View Profile</a>
+                    <a class="dropdown-item" href="/tupdate" id="#" style=" background-color: rgb(195, 67, 172);text-align: center;margin-top: 10px">Update Profile</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="/logout" id="logout-link" style="color: rgb(255, 0, 0); background-color: rgb(40, 38, 38); text-align: center;margin-top: 10px">Logout</a>
+                </div>
+            </li>
+            </ul>
+            
+          </div>
+        </div>
+      </nav>
+      <div class="booking-form-box">
+        <h1>Payment Page</h1>
+        <p style="text-align: center;">Travel Package: {{ travel_package.package_name }}</p>
+        <p style="text-align: center;">Starting date of Journey: {{ travel_package.start_date }}</p>
+        <p style="text-align: center;">End date of Journey: {{ travel_package.end_date }}</p>
+        <p style="text-align: center;">Total Amount: ₹{{ total_amount|floatformat:0 }}</p>
+        <p style="text-align: center;">GST Amount (15%): ₹{{ gst_amount|floatformat:0 }}</p>
+        <p style="text-align: center;">Final Price to Pay: ₹{{ final_price|floatformat:0 }}</p>
+    
+
+    <!-- Include your payment form here -->
+    {% if payment.is_paid %}
+    <a href="/thome" class="update_booking_status">Payment Successful!</a>
+    <a href="{% url 'download_receipt' booking.id %}" class="btn btn-success" style="margin-left: 330px;">Download Receipt</a>
+    {% else %}
+    <form action="{% url 'pay' booking.id %}" method="post"> <!-- Assuming you use POST method for payment -->
+        {% csrf_token %}
+        <input type="hidden" name="booking_id" value="{{ booking.id }}"> <!-- Pass the order ID to the payment function -->
+        <button id="rzp-button1">Pay</button>
+        {% endif %}
+        
+    </form>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

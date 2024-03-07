@@ -1,0 +1,167 @@
+{% load socialaccount %}
+<!-- {% load static %} -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <style>
+        /* Add custom CSS styles here */
+
+        /* Container for the registration links */
+     
+        .navbar {
+            background-color: #113156;
+            color: white;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            text-align: center; /* Center-align the links */
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 20px; /* Adjust spacing between links */
+            transition: color 0.3s, text-decoration 0.3s; /* Smooth transition for text color */
+        }
+
+        .navbar a:hover {
+            color: #cd1100; /* Text color on hover */
+            text-decoration: underline;
+        }
+
+        /* CSS styles for the footer */
+        .footer {
+            background-color: #113156;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+      
+        .registration-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Registration box styles */
+        .registration-box {
+            background-color: #c4c5cd;
+            border: 1px solid #020c16;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            margin: 10px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        /* Registration link styles */
+        .registration-link {
+            color: #751111;
+            text-decoration: none;
+            font-size: 24px;
+        }
+
+        /* Hover effect */
+        .registration-box:hover {
+            background-color: #e2e6ea; /* Change background color on hover */
+            transform: scale(1.05);
+        }
+
+        /* Heading animation */
+        .heading {
+            animation: floatHeading 5s linear infinite;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        @keyframes floatHeading {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Logo image styles */
+        .logo {
+            width: 150px; /* Adjust the width as needed */
+            height: auto; /* Maintain aspect ratio */
+        }
+
+        /* New CSS to align logo to the left of the heading */
+        .logo-and-heading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* Adjust spacing between logo and heading */
+        .logo-and-heading .heading {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container registration-container">
+        <img src="{% static 'Niwi_Travels/images/niwilogo.jpg' %}" class="logo">
+        <h1 class="heading">Welcome to Niwi Travels</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="registration-box">  
+                    <a href="/tregister" class="registration-link">Register as the Traveller</a>
+                 
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="registration-box">
+                    <a href="/dregister" class="registration-link">Register as the Driver</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and jQuery (Make sure to include them before the closing </body> tag) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <div class="navbar">
+        <a href="/">HOME</a>
+        <a href="/">NIWITRAVELS</a>
+        <a href="#">ABOUT</a>
+        <a href="#">SERVICES</a>
+        <a href="#">DESTINATION</a>
+        <a href="/log">LOGIN</a>
+    </div>
+
+    <!-- Content Goes Here -->
+
+    <!-- Footer -->
+    <div class="footer">
+        &copy; 2023 Niwi Travels. All Rights Reserved.
+    </div>
+
+
+
+</body>
+</html>

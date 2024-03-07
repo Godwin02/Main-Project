@@ -1,0 +1,270 @@
+{% load static %}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>{{ package.name }} Details</title>
+        <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+        <link rel="stylesheet" href="{% static 'Niwi_Travels/css/style.css' %}">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+    <style>
+    h1 {
+                font-size: 24px;
+                text-align: center;
+                margin: 20px 0;
+                color: #333;
+            }
+
+            /* Card styles */
+            .card {
+                border: 1px solid #ccc;
+                border-radius: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                transition: transform 0.2s;
+                margin-bottom: 20px;
+            }
+
+            /* Hover effect for the card */
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+            /* Image styles within the card */
+            .card-img-top {
+                width: 100%;
+                height: 200px; /* Set the desired height */
+                object-fit: cover;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+            }
+
+            /* Card title styles */
+            .card-title {
+                font-size: 1.25rem;
+                font-weight: bold;
+            }
+
+            /* Card text styles */
+            .card-text {
+                font-size: 1rem;
+            }
+
+            /* "No upcoming journeys found" message styles */
+            .no-journeys {
+                font-size: 1.25rem;
+                text-align: center;
+                margin: 20px 0;
+            }
+  /* Add custom styles for compact cards and centering */
+  /* Add custom styles for compact cards and centering */
+  .days-details-section {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .days-list {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .day-details {
+    margin: 10px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 300px; /* Adjust the maximum width as needed */
+    width: 100%;
+    height: auto;
+  }
+
+  .day-number {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .description {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .day-image {
+    max-width: 100%;
+    max-height: 150px; /* Set the maximum height for images inside cards */
+    object-fit: cover; /* Ensure the image covers the container */
+    margin-top: 10px;
+    border-radius: 5px;
+  }
+
+  .package-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    background-color: #f8f8f8; /* Light gray background color */
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  .package-image {
+    max-width: 45%; /* Adjust the width as needed */
+    border-radius: 10px;
+  }
+
+  .package-description {
+    max-width: 50%; /* Adjust the width as needed */
+  }
+
+  /* Additional styling for better visual appeal */
+  h2 {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  p {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+    /* Additional styling for bold and colored text */
+    .highlighted-text {
+    font-weight: bold;
+    color: #007BFF; /* Blue color, you can change it as needed */
+  }
+
+  .highlighted-price {
+    font-weight: bold;
+    color: #28a745; /* Green color, you can change it as needed */
+  }
+  form {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #007BFF;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin: 0 auto; /* Center the button horizontally */
+        display: block; /* Ensure the margin property works as expected */
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    a {
+        display: block;
+        margin-top: 20px;
+        text-align: center;
+        color: #007BFF;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    </style>
+    </head>
+    <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+        
+        <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light site-navbar-target" id="ftco-navbar">
+            <div class="container">
+                <img src="{% static 'Niwi_Travels/images/niwilogo.jpg' %}" alt="Logo" width="40px" height="35px"> <a class="navbar-brand" href="#">NIWI TRAVELS</a>
+
+
+            <div class="collapse navbar-collapse" id="ftco-nav">
+                <ul class="navbar-nav nav ml-auto">
+                    
+                <li class="nav-item"><a href="/thome" class="nav-link"><span style="color: #fff;">Home</span></a></li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" style="color: #fff;">
+                        {{ user.username }}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="/upcoming-journeys" id="#" style=" background-color: rgb(42, 165, 67);text-align: center; margin-top: 10px;">Upcoming Journeys</a>
+                        <a class="dropdown-item" href="/ongoing-journeys" id="#" style=" background-color: rgb(218, 180, 13);text-align: center; margin-top: 10px;">Ongoing Trips</a>
+                        <a class="dropdown-item" href="/history-journeys" id="#" style=" background-color: rgb(234, 0, 0);text-align: center;margin-top: 10px">History</a>
+                        <a class="dropdown-item" href="/viewprofileT" style=" background-color: rgb(151, 140, 245);text-align: center;margin-top: 10px">View Profile</a>
+                        <a class="dropdown-item" href="/tupdate" id="#" style=" background-color: rgb(195, 67, 172);text-align: center;margin-top: 10px">Update Profile</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/logout" id="logout-link" style="color: rgb(255, 0, 0); background-color: rgb(40, 38, 38); text-align: center;margin-top: 10px">Logout</a>
+                    </div>
+                </li>
+                </ul>
+                
+            </div>
+            </div>
+        </nav>
+    <br><br>
+    <h2>{{ package.name }} Details</h2>
+    <div class="package-details">
+      <div class="package-image">
+        {% if package.package_image %}
+          <img src="{{ package.package_image.url }}" alt="{{ package.name }} Image" style="width: 100%; border-radius: 10px;">
+        {% else %}
+          <img src="{% static 'placeholder-image.jpg' %}" alt="Placeholder Image" style="width: 100%; border-radius: 10px;">
+        {% endif %}
+      </div>
+      <div class="package-description">
+        <p><strong class="highlighted-text">Embark on a journey:</strong> Travel with us to explore the wonders of {{ package.category }}. Our {{ package.category }} package offers an unforgettable experience, spanning <span class="highlighted-text">{{ package.days }} days</span> and <span class="highlighted-text">{{ package.nights }} nights</span>. Immerse yourself in {{ package.description }}, and all of this comes at a magical price of <span class="highlighted-price">₹{{ package.price }}</span>.</p>
+        <p>Whether you are an adventure seeker or looking for a relaxing family vacation, our package has something for everyone. Book your journey now and make memories that last a lifetime!</p>  
+    </div>
+    </div>
+<!-- Add other package details as needed -->
+       <!-- Creative styling for Days Details -->
+       {% if package.day_set.all %}
+  <div class="days-details-section">
+    <h3 class="section-title">Days Details</h3>
+    <div class="days-list">
+      {% for day in package.day_set.all %}
+        <div class="day-details">
+          <div class="day-number">
+            <span>Day {{ day.day_number }}</span>
+          </div>
+          <div class="day-info">
+            <p class="description">{{ day.image_description }}</p>
+            {% if day.image %}
+              <img src="{{ day.image.url }}" alt="Day {{ day.day_number }} Image" class="day-image">
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  <form method="POST" action="{% url 'add_custom_passenger' package.id %}">
+    <input type="hidden" name="package.id" value="{{ package.id }}">
+    {% csrf_token %}
+    {% if user.is_authenticated %}
+    {% if not passenger %}
+    {% if not from_upcoming_journeys %}
+    <button type="submit">Book Now</button>
+    {% endif %}
+    {% endif %}
+    {% else %}
+    <a href="/log">Click Here to Login and Book Your Destination Soon.</a>
+    {% endif %}
+</form>
+</div>
+</div>
+
+    <!-- <iframe src="https://www.google.com/maps/d/embed?mid=1s-OpCZ7rIU12rcb8JOEe-xiDQz4lBCE&ehbc=2E312F" width="640" height="480"></iframe> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

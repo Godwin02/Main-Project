@@ -1,0 +1,426 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Dashboard</title>
+    <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+
+    <!-- Add your CSS stylesheets and JavaScript files here -->
+    <style>
+        /* Basic styling for the sidebar */
+        .sidebar {
+            background-color: #113156;
+            color: white;
+            position: fixed;
+            width: 250px;
+            height: 100%;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 15px; /* Increase padding to make the links larger */
+            font-size: 18px; /* Increase font size for links */
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #cd1100;
+        }
+
+        /* Styling for the profile picture */
+        .profile-picture {
+            width: 120px; /* Increase the profile picture size */
+            height: 120px; /* Increase the profile picture size */
+            border-radius: 50%;
+            margin: 20px auto;
+            background-color: #fff;
+            background-image: url("{% static 'Niwi_Travels/images/niwilogo.jpg' %}");
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Adjust main content to account for the sidebar */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .table-container {
+            margin-left: 300px;
+            padding: 20px;
+        }
+
+        table {
+            /* Table styles */
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            /* Table cell styles */
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            /* Table header styles */
+            background-color: #333;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+            transition: background-color 0.3s;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        /* Pagination styles */
+        .pagination {
+            text-align: center;
+        }
+
+        .step-links {
+            margin: 20px 0;
+        }
+
+        .step-links a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .current {
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Back button styles */
+        .back-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            text-decoration: none;
+            border: none;
+        }
+
+        .button:hover {
+            background-color: #555;
+        }
+
+        /* Styling for approved and rejected sections */
+        .ftco-section {
+            background-color: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #333;
+        }
+        .approve-button {
+        background-color: #4CAF50; /* Green */
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .approve-button:hover {
+        background-color: #45a049; /* Slightly darker green on hover */
+    }
+
+    .reject-button {
+        background-color: #f44336; /* Red */
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .reject-button:hover {
+        background-color: #d32f2f; /* Slightly darker red on hover */
+    }
+    .navbar {
+    background-color: #007BFF; /* Set your desired background color */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for separation */
+}
+
+/* Style for the h1 in the navbar */
+.navbar h1 {
+    margin: 0;
+    font-size: 24px; /* Adjust the font size */
+}
+
+/* Style for the p in the navbar */
+.navbar p {
+    margin: 0;
+    font-size: 16px; /* Adjust the font size */
+}
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="profile-picture"></div>
+        <a href="/admins" id="logout-link">Home</a>
+        <a href="{% url 'drivers' %}">Total Drivers ({{ user_count }})</a>
+        <a href="#pending">Pending Drivers</a>
+        <a href="#approved">Approved Drivers</a>
+        <a href="#rejected">Rejected Drivers</a>
+
+    </div>
+    <div class="navbar">
+        <h1>Welcome Admin</h1>
+        <p>This is where you can manage users, packages, and ongoing trips.</p>
+    </div>
+    <div class="main-content">
+        <h1>Showing the List of Drivers</h1>
+    </div>
+
+   <div class="table-container">
+    <main>
+        <section class="ftco-section bg-light" id="pending">
+            <h2>Pending Drivers</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>License</th>
+                    <th>Date Of Birth</th>
+                    <th>Location</th>
+                    <th>Verification</th>
+                    <th>Update Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user_profile in user_profiles %}
+                {% if user_profile.driver.verification == 'Pending' %}
+
+                    <tr>
+                        <td>{{ user_profile.username }}</td>
+                        <td>{{ user_profile.email }}</td>
+                        <td>
+                            {% if user_profile.driver.license %}
+                                <a href="{{ user_profile.driver.license.url }}" target="_blank">View License</a>
+                            {% else %}
+                                No License Provided
+                            {% endif %}
+                        </td>
+                        <td>{{ user_profile.driver.date_of_birth }}</td>
+                        <td>{{ user_profile.driver.location }}</td>
+                        <td>{{ user_profile.driver.verification }}</td>
+                        <td>
+                            <form method="post" action="{% url 'update_verification_status' user_profile.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="verification_status" value="approved">
+                                <button type="submit" class="approve-button">Approve</button>
+                            </form>
+                            <form method="post" action="{% url 'update_verification_status' user_profile.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="verification_status" value="rejected">
+                                <button type="submit" class="reject-button">Reject</button>
+                            </form>
+                        </td>
+                        <td>
+                            {% if user_profile.driver.email_sent %}
+                                Email Sent: {{ user_profile.driver.email_sent }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+        <div class="pagination">
+            <span class="step-links">
+                {% if user_profiles.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ user_profiles.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ user_profiles.number }} of {{ user_profiles.paginator.num_pages }}.
+                </span>
+
+                {% if user_profiles.has_next %}
+                    <a href="?page={{ user_profiles.next_page_number }}">next</a>
+                    <a href="?page={{ user_profiles.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+        <div class="back-button">
+            <a href="/admins" class="button">Back</a>
+        </div>
+
+        <section class="ftco-section bg-light" id="approved">
+
+            <h2>Approved Drivers</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>License</th>
+                        <th>Date Of Birth</th>
+                        <th>Location</th>
+                        <th>Verification</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in approved_users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                {% if user.driver.license %}
+                                    <a href="{{ user.driver.license.url }}" target="_blank">View License</a>
+                                {% else %}
+                                    No License Provided
+                                {% endif %}
+                            </td>
+                            <td>{{ user.driver.date_of_birth }}</td>
+                            <td>{{ user.driver.location }}</td>
+                            <td>{{ user.driver.verification }}</td>
+                        <td>
+                            <form method="post" action="{% url 'update_verification_status' user.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="verification_status" value="rejected">
+                                <button type="submit" class="reject-button">Reject</button>
+                            </form>
+                        </td>
+                        <td>
+                            {% if user.driver.email_sent %}
+                                Email Sent: {{ user.driver.email_sent }}
+                            {% endif %}
+                        </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+    </main>
+        <div class="pagination">
+            <span class="step-links">
+                {% if user_profiles.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ user_profiles.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ user_profiles.number }} of {{ user_profiles.paginator.num_pages }}.
+                </span>
+
+                {% if user_profiles.has_next %}
+                    <a href="?page={{ user_profiles.next_page_number }}">next</a>
+                    <a href="?page={{ user_profiles.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+        <div class="back-button">
+            <a href="/admins" class="button">Back</a>
+        </div>
+
+        <section class="ftco-section bg-light" id="rejected">
+
+        <h2>Rejected Drivers</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>License</th>
+                    <th>Date Of Birth</th>
+                    <th>Location</th>
+                    <th>Verification</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in rejected_users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% if user.driver.license %}
+                                <a href="{{ user.driver.license.url }}" target="_blank">View License</a>
+                            {% else %}
+                                No License Provided
+                            {% endif %}
+                        </td>
+                        <td>{{ user.driver.date_of_birth }}</td>
+                        <td>{{ user.driver.location }}</td>
+                        <td>{{ user.driver.verification }}</td>
+                        <td>
+                            <form method="post" action="{% url 'update_verification_status' user.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="verification_status" value="approved">
+                                <button type="submit" class="approve-button">Approve</button>
+                            </form>
+                        </td>
+                        <td>
+                            {% if user.driver.email_sent %}
+                                Email Sent: {{ user.driver.email_sent }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="pagination">
+            <span class="step-links">
+                {% if user_profiles.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ user_profiles.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ user_profiles.number }} of {{ user_profiles.paginator.num_pages }}.
+                </span>
+
+                {% if user_profiles.has_next %}
+                    <a href="?page={{ user_profiles.next_page_number }}">next</a>
+                    <a href="?page={{ user_profiles.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+        <div class="back-button">
+            <a href="/admins" class="button">Back</a>
+        </div>
+    </div>
+</body>
+</html>

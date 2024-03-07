@@ -1,0 +1,98 @@
+{% extends 'driver.html' %}
+{% block content %}
+<style>
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .profile-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .profile-table tr {
+        border-bottom: 1px solid #ddd;
+        transition: background-color 0.3s;
+    }
+
+    .profile-table tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .profile-table td {
+        padding: 10px;
+        text-align: center; /* Center-align table cells */
+    }
+
+    .profile-table label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .profile-table img {
+        max-width: 100px;
+        max-height: 100px;
+        display: block;
+        margin: 0 auto; /* Center-align the image */
+    }
+
+    /* Center-align the "View Profile" heading */
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="container">
+    <h2>View Profile</h2>
+    <table class="profile-table">
+        <tr>
+            <td><label for="username">Username:</label></td>
+            <td>{{ user_details.username }}</td>
+        </tr>
+        <tr>
+            <td><label for="email">Email:</label></td>
+            <td>{{ user_details.email }}</td>
+        </tr>
+        <tr>
+            <td><label for="first_name">First Name:</label></td>
+            <td>{{ profile.first_name }}</td>
+        </tr>
+        <tr>
+            <td><label for="last_name">Last Name:</label></td>
+            <td>{{ profile.last_name }}</td>
+        </tr>
+        <tr>
+            <td><label for="phone_number">Phone Number:</label></td>
+            <td>{{ profile.contact_phone_number }}</td>
+        </tr>
+
+        <tr>
+            <td><label for="profile_photo">Profile Photo:</label></td>
+            <td>
+                {% if profile.profile_photo %}
+                    <img src="{{ profile.profile_photo.url }}" alt="Profile Photo">
+                {% else %}
+                    No profile photo available.
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td><label for="license">Driver's License (PDF):</label></td>
+            <td>
+                {% if profile.license %}
+                    <a href="{{ profile.license.url }}" download>Download License</a>
+                {% else %}
+                    No license available.
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+</div>
+{% endblock %}

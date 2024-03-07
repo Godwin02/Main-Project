@@ -1,0 +1,295 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Travel Package</title>
+    <!-- Include any CSS stylesheets or JavaScript files here -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+</head>
+<style>
+.sidebar {
+    background-color: #113156;
+    color: white;
+    position: fixed;
+    width: 250px;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding-top: 20px;
+    overflow-y: hidden; /* Hide the main scrollbar in the sidebar */
+}
+    .sidebar a {
+        color: white;
+        text-decoration: none;
+        display: block;
+        padding: 15px;
+        font-size: 18px;
+        transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+        background-color: #cd1100;
+    }
+
+    .main-content {
+    margin-left: 250px;
+    padding: 20px;
+    overflow-y: auto; /* Enable vertical scrollbar for the main content */
+}
+
+    /* Styling for the profile picture */
+    .profile-picture {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 20px auto;
+        background-color: #fff;
+        background-image: url("{% static 'Niwi_Travels/images/niwilogo.jpg' %}");
+        background-size: cover;
+        background-position: center;
+    }
+
+    /* Styles for the form */
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f7f7f7;
+        margin: 0;
+        padding: 0;
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+    }
+
+    .package-form {
+        width: 60%;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+        width: 100%;
+    }
+
+    .form-group {
+        margin: 10px 0;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="url"],
+    textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    textarea {
+        height: 100px;
+    }
+    select#accommodation {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    /* Add this CSS to style the options within the "Status" dropdown */
+    select#accommodation option {
+        background-color: #fff;
+        color: #333;
+    }
+    select#status {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    /* Add this CSS to style the options within the "Status" dropdown */
+    select#status option {
+        background-color: #fff;
+        color: #333;
+    }
+
+
+    .submit-button {
+        background-color: #007BFF;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .submit-button:hover {
+        background-color: #0056b3;
+    }
+    .navbar {
+    background-color: #007BFF; /* Set your desired background color */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for separation */
+}
+
+/* Style for the h1 in the navbar */
+.navbar h1 {
+    margin: 0;
+    font-size: 24px; /* Adjust the font size */
+}
+
+/* Style for the p in the navbar */
+.navbar p {
+    margin: 0;
+    font-size: 16px; /* Adjust the font size */
+}
+.scrollable-content {
+    height: calc(100% - 20px); /* Adjust the height as needed */
+    overflow-y: auto; /* Enable vertical scrollbar for the scrollable content */
+}
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+input[type="submit"] {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+
+
+
+
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* Adjust as needed */
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.card {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s;
+    width: 48%; /* 48% to allow some space between cards, adjust as needed */
+    margin-bottom: 20px; /* Add margin between cards, adjust as needed */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+h2 {
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.card a {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    text-decoration: none;
+    color: #fff;
+    background-color: #3498db;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.card a:hover {
+    background-color: #2980b9;
+}
+
+/* Add media query for responsiveness */
+@media (max-width: 768px) {
+    .card {
+        width: 100%; /* On smaller screens, make each card take up 100% width */
+    }
+}
+
+</style>
+<body>
+    <div class="sidebar">
+        <div class="scrollable-content">
+
+        <div class="profile-picture"></div>
+        <a href="/admins" id="logout-link">Home</a>
+        <a href="{% url 'user_list' %}">Users </a>  
+        <a href="/travellers">Travellers</a>
+        <a href="/drivers">Drivers</a> 
+        <a href="/upload_package">Add Package</a>
+        <a href="/admin_custom_package">Custom Packages</a>
+        <a href="/view-packages">View Package</a>
+        <a href="/bookings">Upcoming Journeys</a>
+        <a href="/ongoing-bookings" id="logout-link">Ongoing Journeys</a>
+        <a href="/history-bookings">History Journeys</a>
+        <a href="/logout" id="logout-link">Logout</a> 
+        </div>
+    </div>
+    <div class="navbar">
+        <h1>Welcome Admin</h1>
+        <p>This is where you can manage users, packages, and ongoing trips.</p>
+    </div>
+    <div class="main-content">
+        <div class="container">
+            <div class="card">
+                <h2>Add Package</h2>
+                <p>Create and add a new travel package to the system.</p>
+                <a href="/custom_package" class="add-package">Add Package</a>
+            </div>
+    
+            <div class="card">
+                <h2>View Packages</h2>
+                <p>View and manage existing travel packages.</p>
+                <a href="/view_custom_package" class="view-packages">View Packages</a>
+            </div>
+            <div class="card">
+                <h2>Verification Requests</h2>
+                <p>Approve or Cancel the requests for the different categories of the packages.</p>
+                <a href="/upcoming_custom_bookings" class="add-package">Verification Requests</a>
+            </div>
+            <div class="card">
+                <h2>Verified bookings.</h2>
+                <p>View the Verified bookings of the packages of the different categories.</p>
+                <a href="/verified_custom_bookings" class="add-package">Verified Bookings</a>
+            </div>
+        </div> 
+    </div>
+    </body>
+    
+    </html>

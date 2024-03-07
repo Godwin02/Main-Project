@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict Elevation</title>
+    <style>
+        /* Add any necessary CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            color: #555;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Predict Elevation</h1>
+    <form method="post" enctype="multipart/form-data" action="{% url 'predict_elevation' %}" id="uploadForm">
+        {% csrf_token %}
+        <!-- Input field for file selection -->
+        <input type="file" name="file" accept="image/*" required onchange="displayImage(this)">
+        <!-- Empty image tag for displaying the selected image -->
+        <img id="uploadedImage" src="" alt="Uploaded Image" style="display: none;">
+        <!-- Invisible submit button -->
+        <input type="submit" id="submitButton" style="display: none;">
+        <!-- Display button -->
+        <button type="button" onclick="uploadAndPredict()">Upload and Predict</button>
+    </form>
+
+    <!-- Display the uploaded image -->
+    {% if uploaded_image %}
+        <img src="data:image/png;base64,{{ uploaded_image }}" alt="Uploaded Image">
+    {% endif %}
+
+    <!-- Display the predicted elevation -->
+    {% if predicted_elevation %}
+        <p>Predicted Elevation: {{ predicted_elevation }}</p>
+    {% endif %}
+
+    <script>
+        function displayImage(input) {
+            var uploadedImage = document.getElementById('uploadedImage');
+            uploadedImage.src = URL.createObjectURL(input.files[0]);
+            uploadedImage.style.display = 'block';
+        }
+
+        function uploadAndPredict() {
+            document.getElementById('submitButton').click();
+        }
+    </script>
+</body>
+</html>

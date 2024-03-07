@@ -1,0 +1,350 @@
+{% load static %}
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+
+    <style>
+             .navbar {
+            background-color: #113156;
+            color: white;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 30px 80px;
+            transition: color 0.3s, text-decoration 0.3s ; /* Smooth transition for text color */
+        }
+
+        .navbar a:hover {
+            color: #cd1100; /* Text color on hover */
+            text-decoration: underline;
+        }
+        .footer {
+            background-color: #113156;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            background-image: url("{% static 'Niwi_Travels/images/bg_4.jpg' %}");
+        }
+
+        .registration-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .registration-container h2 {
+            margin-bottom: 20px;
+        }
+
+        .registration-container input[type="text"],
+        .registration-container input[type="email"],
+        .registration-container input[type="password"],
+        .registration-container select {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            border-radius: 4px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .registration-container input[type="text"]:hover,
+        .registration-container input[type="email"]:hover,
+        .registration-container input[type="password"]:hover,
+        .registration-container select:hover {
+            border-color: #007BFF;
+        }
+
+        .registration-container .validation-message {
+            color: red;
+            margin-top: 4px;
+        }
+
+        .registration-container button {
+            background-color: #007BFF;
+            color: white;
+            padding: 14px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .registration-container button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsive design */
+        @media screen and (max-width: 480px) {
+            .registration-container {
+                width: 90%;
+                padding: 15px;
+            }
+        }
+        
+        /* Style labels */
+        .registration-container label {
+            font-weight: bold;
+            font-size: 16px;
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            animation: fadeIn 1.5s ease-in-out;
+        }
+    </style>
+<link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Cormorant+Garamond:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="/">HOME</a>
+        <a href="#">NIWITRAVELS</a>
+        <a href="#">ABOUT</a>
+        <a href="#">SERVICES</a>
+        <a href="#">DESTINATION</a>
+        <a href="/log">LOGIN</a>
+    </div>
+
+
+<div class="registration-container">
+    <h2>VOYAGER DETAILS</h2>
+    {% if messages %}
+        <div class="error_message">
+            <ul class="messages">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    <form action="#" method="post" id="forms">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="email">Email</label>
+       
+            <input type="email" name="email" id="email-input" placeholder="Enter your Email-Id" required>
+            <div id="email-validation-message" class="validation-message">
+            </div>
+        </div>
+
+        <div id="integrity-error-message" class="error_message"></div>   
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password-input" placeholder="Create a password" required>
+            <div id="password-validation-message" class="validation-message"></div>
+        </div>
+        <div class="form-group">
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" name="confirm_password" id="confirm-password-input" placeholder="Confirm Password" required>
+            <div id="confirm-password-validation-message" class="validation-message"></div>
+        </div>
+        <button class="custom-button">Register</button>
+    </form>
+    <p>or</p>
+    <button class="custom-button">
+        <a href="{% provider_login_url 'google' %}">Signup with Google</a>
+    </button>
+</div>
+<script>
+    // Get references to the validation message elements
+
+    const emailValidationMessage = document.getElementById('email-validation-message');
+    const passwordValidationMessage = document.getElementById('password-validation-message');
+    const confirmPasswordValidationMessage = document.getElementById('confirm-password-validation-message');
+    //
+
+    const emailInput = document.getElementById('email-input');
+    const passwordInput = document.getElementById('password-input');
+    const confirmPasswordInput = document.getElementById('confirm-password-input');
+
+// Validate username (no whitespace, only underscores allowed, at least 6 characters)
+
+// Validate email
+emailInput.addEventListener('input', () => {
+    const emailValue = emailInput.value.trim();
+    if (emailValue === '') {
+        emailValidationMessage.textContent = 'Please enter your email.';
+        emailValidationMessage.classList.remove('green-text'); // Remove green color class
+    } else if (!/^[a-zA-Z][a-zA-Z0-9._]*@[a-zA-Z]+[.](gmail|yahoo|com|in|ac|uk|us|gn|eu|outlook|hotmail|icloud|aol|protonmail|zoho|mail|gmx|yandex|fb|ig|mca|ajce|btech)$/.test(emailValue)) {
+        emailValidationMessage.textContent = 'Please enter a valid email address.';
+        emailValidationMessage.classList.remove('green-text'); // Remove green color class
+    } else if (/^\d/.test(emailValue)) {
+        emailValidationMessage.textContent = 'Email cannot start with numbers.';
+        emailValidationMessage.classList.remove('green-text'); // Remove green color class
+    } else if (/^[!#$%^&*()_+]/.test(emailValue)) {
+        emailValidationMessage.textContent = 'Email cannot start with special characters.';
+        emailValidationMessage.classList.remove('green-text'); // Remove green color class
+    } else if (/\.{2,}/.test(emailValue)) {
+        emailValidationMessage.textContent = 'Email should not contain repeated dots.';
+        emailValidationMessage.classList.remove('green-text'); // Remove green color class
+    } else if (/\d$/.test(emailValue)) {
+        emailValidationMessage.textContent = 'Email cannot end with numbers.';
+        emailValidationMessage.classList.remove('green-text'); // Remove green color class
+    } else if (/@[0-9]/.test(emailValue)) {
+        emailValidationMessage.textContent = 'Immediate after "@" symbol, no numbers should be present.';
+        emailValidationMessage.classList.remove('green-text'); // Remove green color class
+    } else if (/[@][!#$%^&*()_+]/.test(emailValue)) {
+        emailValidationMessage.textContent = 'No special characters are allowed immediately after "@" symbol.';
+        emailValidationMessage.classList.remove('green-text'); // Remove green color class
+    } else if (/[@][.]/.test(emailValue)) {
+        emailValidationMessage.textContent = 'Email cannot end with special characters.';
+        emailValidationMessage.classList.remove('green-text'); // Remove green color class
+    } else {
+        emailValidationMessage.textContent = 'Good to go Forward :)';
+        emailValidationMessage.classList.add('green-text'); // Add green color class
+
+        // Set a timeout to erase the message after 5 seconds
+        setTimeout(() => {
+            emailValidationMessage.textContent = ''; // Clear the message
+            emailValidationMessage.classList.remove('green-text'); // Remove green color class
+        }, 5000); // 5000 milliseconds = 5 seconds
+    }
+});
+
+
+
+// Validate password
+passwordInput.addEventListener('input', () => {
+    const passwordValue = passwordInput.value;
+    const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/;
+    if (!passwordPattern.test(passwordValue)) {
+        passwordValidationMessage.textContent = 'Password must contain at least one numeric digit, one uppercase letter, one lowercase letter, and one special character, and be at least 8 characters long';
+        passwordValidationMessage.classList.remove('green-text'); // Remove green color class
+    } else {
+        passwordValidationMessage.textContent = '';
+        passwordValidationMessage.classList.add('green-text'); // Add green color class
+        setTimeout(() => {
+            usernameValidationMessage.textContent = ''; // Clear the message
+            usernameValidationMessage.classList.remove('green-text'); // Remove green color class
+        }, 5000);
+    }
+});
+
+// Validate confirm password
+confirmPasswordInput.addEventListener('input', () => {
+    const confirmPasswordValue = confirmPasswordInput.value;
+    const passwordValue = passwordInput.value;
+    if (confirmPasswordValue === '') {
+        confirmPasswordValidationMessage.textContent = 'Please confirm your password.';
+        confirmPasswordValidationMessage.classList.remove('green-text'); // Remove green color class
+    } else if (confirmPasswordValue !== passwordValue) {
+        confirmPasswordValidationMessage.textContent = 'Passwords do not match.';
+        confirmPasswordValidationMessage.classList.remove('green-text'); // Remove green color class
+    } else {
+        confirmPasswordValidationMessage.textContent = ''; // Add green color class
+    }
+});
+
+// Get a reference to the form
+const form = document.getElementById('forms');
+
+// Function to validate the form on submit
+function validateForm(event) {
+    // Prevent form submission initially
+    event.preventDefault();
+
+    // Check if all validation messages are empty
+    if (
+
+        emailValidationMessage.textContent ||
+        passwordValidationMessage.textContent ||
+        confirmPasswordValidationMessage.textContent
+    ) {
+        // Display a general error message if there are validation errors
+        alert('Please fix the form errors before submitting.');
+    }  else {
+        // Registration is successful
+        // Show a success toast message
+        form.submit();
+        // Submit the form if there are no errors
+        
+    }
+}
+
+// Attach the validateForm function to the form's submit event
+form.addEventListener('submit', validateForm);
+    </script>
+  <div class="footer">
+    &copy; 2023 Niwi Travels. All Rights Reserved.
+</div>
+
+</body>
+<style>
+    /* Define your custom font styles here */
+    .custom-button {
+        background-color: #007BFF;
+        color: white;
+        padding: 14px 20px;
+        margin: 10px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s;
+    }
+
+    .custom-button a {
+        text-decoration: none;
+        color: inherit; /* Inherit the color from the parent */
+        font-weight: bold; /* Set the font weight to bold */
+        font-size: 16px; /* Adjust the font size as needed */
+    }
+
+    .custom-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+</html>

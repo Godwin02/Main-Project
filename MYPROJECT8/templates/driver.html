@@ -1,0 +1,190 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard</title>
+    <link rel="icon" href="{'% static Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+    <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <style>
+        /* Navbar styles */
+        .navbar {
+            background-color: #113156;
+        }
+
+        .navbar-brand {
+            color: white;
+            font-size: 24px;
+        }
+
+        .navbar-brand img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .navbar-nav .nav-link {
+            color: #fff;
+            transition: color 0.3s;
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #cd1100;
+        }
+
+        .navbar-nav .nav-link::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: #cd1100;
+            bottom: 0;
+            left: 0;
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .navbar-nav .nav-link:hover::after {
+            transform: scaleX(1);
+        }
+        .footer {
+            background-color: #113156;
+            color: white;
+            text-align: center;
+            padding: 5px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        /* Background image */
+        body {
+            background-image: url("{% static 'Niwi_Travels/images/bg_2.jpg' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        /* Floating heading animation */
+        @keyframes floatHeading {
+        0% {
+        right: 100%; /* Start position - right corner of the screen */
+        transform: translateX(100%); /* Move the heading to the right, out of the screen */
+    }
+    20% {
+        right: 75%; /* Move to 75% right of the screen */
+        transform: translateX(100%); /* Start moving the heading to the left */
+    }
+    100% {
+        right: 0; /* End position - left corner of the screen */
+        transform: translateX(-100%);
+    }
+    }
+
+    .animated-heading {
+        animation: floatHeading 20s linear infinite;
+        white-space: nowrap;
+        overflow: hidden;
+        position: absolute;
+        top: 10px;
+        color: #fff;
+        margin-right: 30px; /* Adjust this margin as needed */
+    }
+        /* Main content styles */
+        .container {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'Niwi_Travels/images/niwilogo.jpg' %}" alt="Logo">
+           
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href='/'>Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Upcoming Trips</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">History</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-toggle="dropdown">
+                        My Account
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/viewprofileD">View Profile</a>
+                        <a class="dropdown-item" href="/dupdate">Update Profile</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/logout" id="logout-link">Logout</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Add your content here -->
+        <div class="navbar-title animated-heading">
+            <h3>Welcome to Niwi Travels {{ user.username }}</h3>
+        </div>
+    
+    </div>
+    <div class="container mt-5">
+        <!-- Add your page-specific content here -->
+        {% block content %}
+        {% endblock %}
+    </div>
+    <!-- Bootstrap JS and jQuery (Make sure to include them before the closing </body> tag) -->
+    <script>
+        // Wait for the document to be fully loaded
+        document.addEventListener("DOMContentLoaded", function () {
+            // Find the logout button by its ID
+            var logoutButton = document.getElementById("logout-link");
+    
+            // Add a click event listener to the logout button
+            logoutButton.addEventListener("click", function () {
+                // Reload the page after a short delay (you can adjust the delay as needed)
+                setTimeout(function () {
+                    location.reload();
+                }, 1000); // Reload after 1 second (1000 milliseconds)
+            });
+        });
+    </script>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <div class="footer">
+        &copy; 2023 Niwi Travels. All Rights Reserved.
+    </div>
+    <script>
+        // Add an event listener to the document to listen for keydown events
+        document.addEventListener('keydown', function(event) {
+            // Check if the pressed key is the left arrow key (key code 37) and the Alt key (event.altKey)
+            if (event.keyCode === 37 && event.altKey) {
+                // Redirect to your home page URL
+                window.location.href = '/'; // Replace with your actual home page URL
+            }
+        });
+    </script>
+</body>
+</html>

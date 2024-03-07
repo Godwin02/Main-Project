@@ -1,0 +1,185 @@
+{% load static %}
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+
+    <style>
+        /* Navbar styles (unchanged) */
+        .navbar {
+            background-color: #113156;
+            color: white;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 30px 80px;
+            transition: color 0.3s, text-decoration 0.3s ; /* Smooth transition for text color */
+        }
+
+        .navbar a:hover {
+            color: #cd1100; /* Text color on hover */
+            text-decoration: underline;
+        }
+        .footer {
+            background-color: #113156;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url("{% static 'Niwi_Travels/images/destination-6.jpg' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-container h2 {
+            margin-bottom: 20px;
+        }
+
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+
+        .login-container button {
+            background-color: #007BFF;
+            color: white;
+            padding: 14px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .login-container button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsive design (unchanged) */
+        @media screen and (max-width: 480px) {
+            .login-container {
+                width: 90%;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="/">HOME</a>
+        <a href="#">NIWITRAVELS</a>
+        <a href="#">ABOUT</a>
+        <a href="#">SERVICES</a>
+        <a href="#">DESTINATION</a>
+        <a href="/register">REGISTER</a>
+    </div>
+
+    <!-- Login container -->
+    <div class="login-container">
+        <h2>Login</h2>
+        {% if messages %}
+        <div class="error_message">
+            <ul class="messages">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Enter your Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit" id="login-link">Login</button>
+            <a href="{% url 'reset_password' %}">Forgot Your Password</a><br>
+            <button class="custom-button">
+                <a href="{% provider_login_url 'google' %}">Login with Google</a>
+            </button>
+            
+        </form>
+    </div>
+    <div class="footer">
+        &copy; 2023 Niwi Travels. All Rights Reserved.
+    </div>
+    <script>
+        // Wait for the document to be fully loaded
+        document.addEventListener("DOMContentLoaded", function () {
+            // Find the logout button by its ID
+            var logoutButton = document.getElementById("login-link");
+    
+            // Add a click event listener to the logout button
+            logoutButton.addEventListener("click", function () {
+                // Reload the page after a short delay (you can adjust the delay as needed)
+                setTimeout(function () {
+                    location.reload();
+                }, 1000); // Reload after 1 second (1000 milliseconds)
+            });
+        });
+    </script>
+</body>
+<style>
+    /* Define your custom font styles here */
+    .custom-button {
+        background-color: #007BFF;
+        color: white;
+        padding: 14px 20px;
+        margin: 10px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s;
+    }
+
+    .custom-button a {
+        text-decoration: none;
+        color: inherit; /* Inherit the color from the parent */
+        font-weight: bold; /* Set the font weight to bold */
+        font-size: 16px; /* Adjust the font size as needed */
+    }
+
+    .custom-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+</html>

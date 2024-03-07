@@ -1,0 +1,176 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Bookings</title>
+    <style>
+.table-container {
+    margin-left: 300px; /* Adjust the margin to position the table to the right of the sidebar */
+    padding: 20px;
+}
+
+/* Style for the table */
+table {
+    width: 90%; /* Increase the table width */
+    margin: 20px auto; /* Center the table horizontally */
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px; /* Increase padding for better spacing */
+    text-align: left;
+}
+
+th {
+    background-color: #333;
+    color: #fff;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+    transition: background-color 0.3s; /* Add hover transition effect */
+}
+
+/* Add hover effect on table rows */
+tr:hover {
+    background-color: #ddd;
+}
+     .sidebar {
+            background-color: #113156;
+            color: white;
+            position: fixed;
+            width: 250px;
+            height: 100%;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 15px; /* Increase padding to make the links larger */
+            font-size: 18px; /* Increase font size for links */
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #cd1100;
+        }
+
+        /* Styling for the profile picture */
+        .profile-picture {
+            width: 120px; /* Increase the profile picture size */
+            height: 120px; /* Increase the profile picture size */
+            border-radius: 50%;
+            margin: 20px auto;
+            background-color: #fff;
+            background-image: url("{% static 'Niwi_Travels/images/niwilogo.jpg' %}");
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Adjust main content to account for the sidebar */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .h1{
+            text-align: center;
+            justify-content: center;
+        }
+        .navbar {
+    background-color: #007BFF; /* Set your desired background color */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for separation */
+}
+
+/* Style for the h1 in the navbar */
+.navbar h1 {
+    margin: 0;
+    font-size: 24px; /* Adjust the font size */
+}
+
+/* Style for the p in the navbar */
+.navbar p {
+    margin: 0;
+    font-size: 16px; /* Adjust the font size */
+}
+.pagination {
+        text-align: center; /* Center the pagination links */
+        margin-top: 20px; /* Add some space between the table and pagination */
+    }
+
+    .page-links a {
+        margin: 0 5px; /* Add space between pagination links */
+        text-decoration: none;
+        color: #007BFF; /* Set the link color */
+    }
+
+    .page-links a:hover {
+        text-decoration: underline; /* Add an underline on hover */
+    }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="profile-picture"></div>
+        <a href="/admins" id="logout-link">Home</a>
+        <a href="{% url 'user_list' %}">Users </a>  
+        <a href="/travellers">Travellers</a>
+        <a href="/drivers">Drivers</a> 
+        <a href="/upload_package">Add Package</a>
+        <a href="/view-packages">View Package</a>
+        <a href="/bookings">Upcoming Journeys</a>
+        <a href="/ongoing-bookings" id="logout-link">Ongoing Journeys</a>
+        <a href="/history-bookings">History Journeys</a>
+        <a href="/logout" id="logout-link">Logout</a>        
+    </div>
+    <div class="navbar">
+        <h1>Welcome Admin</h1>
+        <p>This is where you can manage users, packages, and ongoing trips.</p>
+    </div>
+        <div class="main-content">
+            <h1>Passengers Details</h1>
+        </div>
+        <div class="table-container">
+                <main>
+            <table border="1">
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Proof of ID</th>
+                </tr>
+                {% for passenger in passengers %}
+                <tr>
+                    <td>{{ passenger.passenger_name }}</td>
+                    <td>{{ passenger.passenger_age }}</td>
+                    <td><a href="{{ passenger.proof_of_id.url }}" target="_blank">View Proof of ID</a></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No passengers found for this package.</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <div class="pagination">
+                <span class="current">Page {{ passengers.number }} of {{ passengers.paginator.num_pages }}.</span>
+                {% if passengers.has_previous %}
+                    <a href="?page=1">First</a>
+                    <a href="?page={{ passengers.previous_page_number }}">Previous</a>
+                {% endif %}
+                {% if passengers.has_next %}
+                    <a href="?page={{ passengers.next_page_number }}">Next</a>
+                    <a href="?page={{ passengers.paginator.num_pages }}">Last</a>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+   
+</body>
+</html>

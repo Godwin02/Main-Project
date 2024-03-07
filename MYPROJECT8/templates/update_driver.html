@@ -1,0 +1,160 @@
+{% extends 'driver.html' %}
+{% block content %}
+<style>
+    .profile-table {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .profile-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left; /* Left-align table content */
+    }
+
+    .profile-table tr {
+        transition: background-color 0.3s;
+    }
+
+    .profile-table tr:nth-child(odd) {
+        background-color: #f5f5f5;
+    }
+
+    .profile-table td {
+        padding: 10px;
+    }
+
+    .profile-table label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .profile-table input[type="text"],
+    .profile-table input[type="email"],
+    .profile-table input[type="file"],
+    .profile-table input[type="number"],
+    .profile-table input[type="date"] {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .profile-table input[type="text"]:hover,
+    .profile-table input[type="email"]:hover,
+    .profile-table input[type="file"]:hover,
+    .profile-table input[type="number"]:hover,
+    .profile-table input[type="date"]:hover {
+        border-color: #007BFF;
+    }
+
+    /* Style the file input field */
+    .profile-table input[type="file"] {
+        cursor: pointer; /* Add a pointer cursor on hover */
+    }
+
+    /* Style the submit button */
+    .profile-table button[type="submit"] {
+        display: block;
+        margin: 20px auto;
+        background-color: #007BFF;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .profile-table button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+
+    /* Center-align the heading */
+    h2 {
+        text-align: center;
+        margin: 0 auto 20px auto;
+    }
+
+    /* Style error messages (you may need to adjust this) */
+    .error-message {
+        color: #ff0000;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+</style>
+
+<div class="profile-table">
+    <h2>Update Driver Profile</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <td><label for="first_name">First Name:</label></td>
+                <td><input type="text" name="first_name" id="first_name" required value="{{ profile.first_name }}"></td>
+            </tr>
+            <tr>
+                <td><label for="last_name">Last Name:</label></td>
+                <td><input type="text" name="last_name" id="last_name" required value="{{ profile.last_name }}"></td>
+            </tr>
+            <tr>
+                <td><label for="contact_email">Email:</label></td>
+                <td><input type="email" name="contact_email" id="contact_email" required value="{{ profile.contact_email }}"></td>
+            </tr>
+            <tr>
+                <td><label for="contact_phone_number">Phone Number:</label></td>
+                <td><input type="text" name="contact_phone_number" id="contact_phone_number" required value="{{ profile.contact_phone_number }}"></td>
+            </tr>
+            <tr>
+                <td><label for="date_of_birth">Date of Birth:</label></td>
+                <td><input type="date" name="date_of_birth" id="date_of_birth" value="{{ profile.date_of_birth }}"></td>
+            </tr>
+            <tr>
+                <td><label for="location">Location:</label></td>
+                <td><input type="text" name="location" id="location" value="{{ profile.location }}"></td>
+            </tr>
+            <tr>
+                <td><label for="profile_photo">Profile Photo:</label></td>
+                <td>
+                    {% if profile.profile_photo %}
+                        <img src="{{ profile.profile_photo.url }}" alt="Profile Photo" width="250px" height="200px">
+                    {% endif %}
+                    <input type="file" name="profile_photo" id="profile_photo" accept=".jpg">
+                </td>
+            </tr>
+            <tr>
+                <td><label for="license">Driver's License (PDF):</label></td>
+                <td>
+                    {% if profile.license %}
+                        <a href="{{ profile.license.url }}" download>Download License</a>
+                    {% endif %}
+                    <input type="file" name="license" id="license" accept=".pdf">
+                </td>
+            </tr>
+        </table>
+        <button type="submit" id="update-button">Update Profile</button>
+    </form>
+</div>
+
+<script>
+    // Wait for the document to be fully loaded
+    document.addEventListener("DOMContentLoaded", function () {
+        // Find the update button by its ID
+        var updateButton = document.getElementById("update-button");
+
+        // Add a click event listener to the update button
+        updateButton.addEventListener("click", function () {
+            // Reload the page after a short delay (you can adjust the delay as needed)
+            setTimeout(function () {
+                location.reload();
+            }, 1000); // Reload after 1 second (1000 milliseconds)
+        });
+    });
+</script>
+{% endblock %}

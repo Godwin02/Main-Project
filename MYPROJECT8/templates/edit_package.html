@@ -1,0 +1,660 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Travel Package</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'your_custom.css' %}">
+    <!-- Include any other CSS stylesheets or JavaScript files here -->
+</head>
+<style>
+    .sidebar {
+        background-color: #113156;
+        color: white;
+        position: fixed;
+        width: 250px;
+        height: 100%;
+        top: 0;
+        left: 0;
+        padding-top: 20px;
+    }
+
+    .sidebar a {
+        color: white;
+        text-decoration: none;
+        display: block;
+        padding: 15px;
+        font-size: 18px;
+        transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+        background-color: #cd1100;
+    }
+
+    .main-content {
+        margin-left: 250px;
+        padding: 20px;
+    }
+
+    /* Styling for the profile picture */
+    .profile-picture {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 20px auto;
+        background-color: #fff;
+        background-image: url("{% static 'Niwi_Travels/images/niwilogo.jpg' %}");
+        background-size: cover;
+        background-position: center;
+    }
+
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f7f7f7;
+        margin: 0;
+        padding: 0;
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+    }
+
+    .package-form {
+        width: 60%;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+        width: 100%;
+    }
+
+    .form-group {
+        margin: 10px 0;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="url"],
+    textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    textarea {
+        height: 100px;
+    }
+
+    select#accommodation, select#status {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    /* Add this CSS to style the options within the dropdowns */
+    select#accommodation option, select#status option {
+        background-color: #fff;
+        color: #333;
+    }
+
+    .submit-button {
+        background-color: #007BFF;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .submit-button:hover {
+        background-color: #0056b3;
+    }
+    .navbar {
+    background-color: #007BFF; /* Set your desired background color */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for separation */
+}
+
+/* Style for the h1 in the navbar */
+.navbar h1 {
+    margin: 0;
+    font-size: 24px; /* Adjust the font size */
+}
+
+/* Style for the p in the navbar */
+.navbar p {
+    margin: 0;
+    font-size: 16px; /* Adjust the font size */
+}
+</style>
+<body>
+    <div class="sidebar">
+        <div class="profile-picture"></div>
+        <a href="/admins" id="logout-link">Home</a>
+        <a href="{% url 'user_list' %}">Users </a>  
+        <a href="/travellers">Travellers</a>
+        <a href="/drivers">Drivers</a> 
+        <a href="/upload_package">Add Package</a>
+        <a href="/view-packages">View Package</a>
+        <a href="/bookings">Verification Requests</a>
+        <a href="/verified_bookings">Verified Bookings</a>
+        <a href="/ongoing-bookings" id="logout-link">Ongoing Journeys</a>
+        <a href="/history-bookings">History Journeys</a>
+        <a href="/logout" id="logout-link">Logout</a> 
+    </div>
+    <div class="navbar">
+        <h1>Welcome Admin</h1>
+        <p>This is where you can manage users, packages, and ongoing trips.</p>
+    </div>
+    <div class="main-content">
+        <h2>Edit Travel Package</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <table class="package-form">
+                <tr>
+                    <td><label for="package_name">Package Name:</label></td>
+                    <td><input type="text" id="package_name" name="package_name" value="{{ package.package_name }}" required>
+                        <span id="package_name-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="description">Description:</label></td>
+                    <td><textarea id="description" name="description" required>{{ package.description }}</textarea>
+                        <span id="description-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="destination">Destination:</label></td>
+                    <td><input type="text" id="destination" name="destination" value="{{ package.destination }}" required>
+                        <span id="destination-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="duration">Duration (days):</label></td>
+                    <td><input type="number" id="duration" name="duration" value="{{ package.duration }}" required>
+                        <span id="duration-validation-message" class= "validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="price">Price (₹):</label></td>
+                    <td><input type="number" id="price" name="price" value="{{ package.price }}" required>
+                        <span id="price-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="start_date">Start Date:</label></td>
+                    <td><input type="date" id="start_date" name="start_date" value="{{ package.start_date|date:'Y-m-d' }}" required>
+                        <span id="start_date-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="end_date">End Date:</label></td>
+                    <td><input type="date" id="end_date" name="end_date" value="{{ package.end_date|date:'Y-m-d' }}" required>
+                        <span id="end_date-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="accommodation">Food & Accommodation:</label></td>
+                    <td>
+                        <select id="accommodation" name="accommodation" required>
+                            <option value="Included" {% if package.accommodation == 'Included' %}selected{% endif %}>Included</option>
+                            <option value="Excluded" {% if package.accommodation == 'Excluded' %}selected{% endif %}>Excluded</option>
+                        </select>
+                        <span id="accommodation-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="transportation">Transportation:</label></td>
+                    <td><input type="text" id="transportation" name="transportation" value="{{ package.transportation }}" required>
+                        <span id="transportation-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="activities">Activities:</label></td>
+                    <td><textarea id="activities" name="activities" required>{{ package.activities }}</textarea>
+                        <span id="activities-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="inclusions">Inclusions:</label></td>
+                    <td><textarea id="inclusions" name="inclusions" required>{{ package.inclusions }}</textarea>
+                            <input type="checkbox" id="travel-insurance" name="inclusions_travel-insurance" value="Travel Insurance">
+                            <label for="travel-insurance">Travel Insurance</label><br>
+                            
+                            <input type="checkbox" id="taxes-and-service-charges" name="inclusions_taxes-and-service-charges" value="Taxes and Service Charges">
+                            <label for="taxes-and-service-charges">Taxes and Service Charges</label><br>
+                            
+                            <input type="checkbox" id="customer-support" name="inclusions_customer-support" value="24/7 Customer Support">
+                            <label for="customer-support">24/7 Customer Support</label><br>
+                            
+                            <input type="checkbox" id="local-transport" name="inclusions_local-transport" value="Local Transport">
+                            <label for="local-transport">Local Transport</label><br>
+                            
+                            <input type="checkbox" id="special-events" name="inclusions_special-events" value="Special Events">
+                            <label for="special-events">Special Events</label><br>
+                            
+                            <input type="checkbox" id="language-support" name="inclusions_language-support" value="Language Support">
+                            <label for="language-support">Language Support</label><br>
+                            
+                            <input type="checkbox" id="group-size" name="inclusions_group-size" value="Group Size">
+                            <label for="group-size">Group Size</label><br>
+                            
+                            <input type="checkbox" id="itinerary" name="inclusions_itinerary" value="Itinerary">
+                            <label for="itinerary">Itinerary</label><br>
+                            
+                            <input type="checkbox" id="hotel-upgrades" name="inclusions_hotel-upgrades" value="Hotel Upgrades">
+                            <label for="hotel-upgrades">Hotel Upgrades</label><br>
+                            
+                            <input type="checkbox" id="special-requests" name="inclusions_special-requests" value="Special Requests">
+                            <label for="special-requests">Special Requests</label><br>
+                            
+                            <input type="checkbox" id="emergency-support" name="inclusions_emergency-support" value="Emergency Support">
+                            <label for="emergency-support">Emergency Support</label><br>
+                            
+                            <input type="checkbox" id="cultural-workshops" name="inclusions_cultural-workshops" value="Cultural Workshops">
+                            <label for="cultural-workshops">Cultural Workshops</label><br>
+                            
+                            <input type="checkbox" id="wildlife-safaris" name="inclusions_wildlife-safaris" value="Wildlife Safaris">
+                            <label for="wildlife-safaris">Wildlife Safaris</label><br>
+                            
+                            <input type="checkbox" id="adventure-activities" name="inclusions_adventure-activities" value="Adventure Activities">
+                            <label for="adventure-activities">Adventure Activities</label><br>
+                            
+                            <input type="checkbox" id="spa-and-wellness" name="inclusions_spa-and-wellness" value="Spa and Wellness">
+                            <label for="spa-and-wellness">Spa and Wellness</label><br>
+                            
+                            <input type="checkbox" id="private-tours" name="inclusions_private-tours" value="Private Tours">
+                            <label for="private-tours">Private Tours</label><br>
+                            
+                            <input type="checkbox" id="photography-services" name="inclusions_photography-services" value="Photography Services">
+                            <label for="photography-services">Photography Services</label><br>
+                            
+                            <input type="checkbox" id="local-experiences" name="inclusions_local-experiences" value="Local Experiences">
+                            <label for="local-experiences">Local Experiences</label><br>
+                            
+                            <input type="checkbox" id="scenic-cruises" name="inclusions_scenic-cruises" value="Scenic Cruises">
+                            <label for="scenic-cruises">Scenic Cruises</label><br>
+                            
+                            <input type="checkbox" id="historical-sites" name="inclusions_historical-sites" value="Historical Sites">
+                            <label for="historical-sites">Historical Sites</label><br>
+                            
+                            <input type="checkbox" id="nightlife-entertainment" name="inclusions_nightlife-entertainment" value="Nightlife and Entertainment">
+                            <label for="nightlife-entertainment">Nightlife and Entertainment</label><br>
+                            
+                            <input type="checkbox" id="outdoor-adventures" name="inclusions_outdoor-adventures" value="Outdoor Adventures">
+                            <label for="outdoor-adventures">Outdoor Adventures</label><br>
+                            
+                            <input type="checkbox" id="food-culinary-tours" name="inclusions_food-culinary-tours" value="Food and Culinary Tours">
+                            <label for="food-culinary-tours">Food and Culinary Tours</label><br>
+                            
+                            <input type="checkbox" id="private-transportation" name="inclusions_private-transportation" value="Private Transportation">
+                            <label for="private-transportation">Private Transportation</label><br>
+                            
+                            <input type="checkbox" id="sustainable-travel" name="inclusions_sustainable-travel" value="Sustainable Travel">
+                            <label for="sustainable-travel">Sustainable Travel</label><br>
+                            
+                            <input type="checkbox" id="exclusive-access" name="inclusions_exclusive-access" value="Exclusive Access">
+                            <label for="exclusive-access">Exclusive Access</label><br>
+                            
+                            <input type="checkbox" id="personalized-app" name="inclusions_personalized-app" value="Personalized Travel App">
+                            <label for="personalized-app">Personalized Travel App</label><br><br>
+                        </td>
+                </tr>
+                <tr>
+                    <td><label for="exclusions">Exclusions:</label></td>
+                    <td><textarea id="exclusions" name="exclusions" required>{{ package.exclusions }}</textarea>
+                        <input type="checkbox" id="flights" name="exclusions_flights" value="Flights">
+                        <label for="flights">Flights</label><br>
+                
+                        <input type="checkbox" id="visa-fees" name="exclusions_visa-fees" value="Visa and Passport Fees">
+                        <label for="visa-fees">Visa and Passport Fees</label><br>
+                
+                        <input type="checkbox" id="personal-expenses" name="exclusions_personal-expenses" value="Personal Expenses">
+                        <label for="personal-expenses">Personal Expenses</label><br>
+                
+                        <input type="checkbox" id="insurance-limitations" name="exclusions_insurance-limitations" value="Travel Insurance Limitations">
+                        <label for="insurance-limitations">Travel Insurance Limitations</label><br>
+                
+                        <input type="checkbox" id="optional-activities" name="exclusions_optional-activities" value="Optional Activities">
+                        <label for="optional-activities">Optional Activities</label><br>
+                
+                        <input type="checkbox" id="tips-gratuities" name="exclusions_tips-gratuities" value="Tips and Gratuities">
+                        <label for="tips-gratuities">Tips and Gratuities</label><br>
+                
+                        <input type="checkbox" id="alcohol-beverages" name="exclusions_alcohol-beverages" value="Alcohol and Beverages">
+                        <label for="alcohol-beverages">Alcohol and Beverages</label><br>
+                
+                        <input type="checkbox" id="medical-expenses" name="exclusions_medical-expenses" value="Medical Expenses">
+                        <label for="medical-expenses">Medical Expenses</label><br>
+                
+                        <input type="checkbox" id="personal-documents" name="exclusions_personal-documents" value="Personal Documents">
+                        <label for="personal-documents">Personal Documents</label><br>
+                
+                        <input type="checkbox" id="unforeseen-circumstances" name="exclusions_unforeseen-circumstances" value="Unforeseen Circumstances">
+                        <label for="unforeseen-circumstances">Unforeseen Circumstances</label><br>
+                
+                        <input type="checkbox" id="travel-vaccinations" name="exclusions_travel-vaccinations" value="Travel Vaccinations">
+                        <label for="travel-vaccinations">Travel Vaccinations</label><br>
+                
+                        <input type="checkbox" id="lost-stolen-items" name="exclusions_lost-stolen-items" value="Lost or Stolen Items">
+                        <label for="lost-stolen-items">Lost or Stolen Items</label><br>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="images">Images (Upload one or more images):</label></td>
+                    <td><input type="file" id="images" name="images" multiple required>
+                        <span id="images-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="category">Category:</label></td>
+                    <td><input type="text" id="category" name="category" value="{{ package.category }}" required>
+                        <span id="category-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="tags">Tags (comma-separated):</label></td>
+                    <td><input type="text" id="tags" name="tags" value="{{ package.tags }}" required>
+                        <span id="tags-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="availability">Availability:</label></td>
+                    <td><input type="number" id="availability" name="availability" value="{{ package.availability }}" required>
+                        <span id="availability-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="booking_deadline">Booking Deadline:</label></td>
+                    <td><input type="date" id="booking_deadline" name="booking_deadline" value="{{ package.booking_deadline|date:'Y-m-d' }}" required>
+                        <span id="booking_deadline-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="cancellation_policy">Cancellation Policy:</label></td>
+                    <td><textarea id="cancellation_policy" name="cancellation_policy" required>{{ package.cancellation_policy }}</textarea>
+                        <span id="cancellation_policy-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="status">Status:</label></td>
+                    <td>
+                        <select id="status" name="status" required>
+                            <option value="Running" {% if package.status == 'Running' %}selected{% endif %}>Running</option>
+                            <option value="Pending" {% if package.status == 'Pending' %}selected{% endif %}>Pending</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="feed">Feed</label>
+                    </td>
+                    <td>
+                        <select id="accommodation" name="feed" required>
+                            <option value="Save">Save</option>
+                            <option value="Post">Post</option>
+                        </select>
+                        <span id="accommodation-validation-message" class="validation-message"></span>
+                    </td>
+                </tr>
+            </table>
+            <input class="submit-button" type="submit" value="Save Changes">
+        </form>
+    </div>
+    <script>
+        // Get references to the new input fields and their respective validation messages
+        const package_nameInput = document.getElementById('package_name');
+        const package_nameValidationMessage = document.getElementById('package_name-validation-message');
+
+        const descriptionInput = document.getElementById('description');
+        const descriptionValidationMessage = document.getElementById('description-validation-message');
+
+        const destinationInput = document.getElementById('destination');
+        const destinationValidationMessage = document.getElementById('destination-validation-message');
+        
+        const durationInput = document.getElementById('duration');
+        const durationValidationMessage = document.getElementById('duration-validation-message');
+        
+        const priceInput = document.getElementById('price');
+        const priceValidationMessage = document.getElementById('price-validation-message');
+        
+        const start_dateInput = document.getElementById('start_date');
+        const start_dateValidationMessage = document.getElementById('start_date-validation-message');
+        
+        const end_dateInput = document.getElementById('end_date');
+        const end_dateValidationMessage = document.getElementById('end_date-validation-message');
+        
+        const accommodationInput = document.getElementById('accommodation');
+        const accommodationValidationMessage = document.getElementById('accommodation-validation-message');
+        
+        const transportationInput = document.getElementById('transportation');
+        const transportationValidationMessage = document.getElementById('transportation-validation-message');
+        
+        const activitiesInput = document.getElementById('activities');
+        const activitiesValidationMessage = document.getElementById('activities-validation-message');
+
+        const imagesInput = document.getElementById('images');
+        const categoryInput = document.getElementById('category');
+        const tagsInput = document.getElementById('tags');
+        const availabilityInput = document.getElementById('availability');
+        const booking_deadlineInput = document.getElementById('booking_deadline');
+        const cancellation_policyInput = document.getElementById('cancellation_policy');
+
+const imagesValidationMessage = document.getElementById('images-validation-message');
+const categoryValidationMessage = document.getElementById('category-validation-message');
+const tagsValidationMessage = document.getElementById('tags-validation-message');
+const availabilityValidationMessage = document.getElementById('availability-validation-message');
+const booking_deadlineValidationMessage = document.getElementById('booking_deadline-validation-message');
+const cancellation_policyValidationMessage = document.getElementById('cancellation_policy-validation-message');
+
+    
+        // Add input event listeners for real-time validation for the new fields
+        package_nameInput.addEventListener('input',validatePackage);
+        descriptionInput.addEventListener('input',validateDescription);
+        destinationInput.addEventListener('input', validateDestination);
+        durationInput.addEventListener('input', validateDuration);
+        priceInput.addEventListener('input', validatePrice);
+        start_dateInput.addEventListener('input', validateStartDate);
+        end_dateInput.addEventListener('input', validateEndDate);
+        accommodationInput.addEventListener('input', validateAccommodation);
+        transportationInput.addEventListener('input', validateTransportation);
+        activitiesInput.addEventListener('input', validateActivities);
+imagesInput.addEventListener('input', validateImages);
+categoryInput.addEventListener('input', validateCategory);
+tagsInput.addEventListener('input', validateTags);
+availabilityInput.addEventListener('input', validateAvailability);
+booking_deadlineInput.addEventListener('input', validateBookingDeadline);
+cancellation_policyInput.addEventListener('input', validateCancellationPolicy);
+    
+        // Validation functions for the new fields
+        function validatePackage() {
+    const packageName = package_nameInput.value;
+
+    if (packageName.trim() === '') {
+        package_nameValidationMessage.textContent = 'Package name is required.';
+    } else {
+        // Use a regular expression to match only alphabets and spaces
+        const validChars = /^[A-Za-z ]+$/;
+
+        if (!validChars.test(packageName)) {
+            package_nameValidationMessage.textContent = 'Package name can only contain alphabets and spaces.';
+        } else {
+            package_nameValidationMessage.textContent = '';
+        }
+    }
+}
+
+        function validateDescription() {
+            if (descriptionInput.value.trim() === '') {
+                descriptionValidationMessage.textContent = 'Description is required.';
+            } else {
+                descriptionValidationMessage.textContent = '';
+            }
+        }
+        function validateDestination() {
+    const destination = destinationInput.value;
+
+    if (destination.trim() === '') {
+        destinationValidationMessage.textContent = 'Destination is required.';
+    } else if (/[^a-zA-Z\s]/.test(destination)) {
+        destinationValidationMessage.textContent = 'Destination should contain only alphabets and spaces.';
+    } else {
+        destinationValidationMessage.textContent = '';
+    }
+}
+
+    
+        function validateDuration() {
+            if (durationInput.value < 1) {
+                durationValidationMessage.textContent = 'Duration must be at least 1 day.';
+            } else {
+                durationValidationMessage.textContent = '';
+            }
+        }
+    
+        function validatePrice() {
+            if (priceInput.value < 0) {
+                priceValidationMessage.textContent = 'Price cannot be negative.';
+            } else {
+                priceValidationMessage.textContent = '';
+            }
+        }
+        
+        function validateStartDate() {
+    const startDate = new Date(start_dateInput.value);
+    const currentDate = new Date();
+
+    // Calculate the minimum allowed start date (current date + 10 days)
+    const minimumStartDate = new Date(currentDate);
+    minimumStartDate.setDate(currentDate.getDate() + 10);
+
+    if (startDate <= minimumStartDate) {
+        start_dateValidationMessage.textContent = 'Start date must be at least 10 days greater than the current date.';
+    } else {
+        start_dateValidationMessage.textContent = '';
+    }
+}
+    
+function validateEndDate() {
+    const startDate = new Date(start_dateInput.value);
+const duration = parseInt(durationInput.value);
+const endDate = new Date(end_dateInput.value);
+
+if (!isNaN(duration)) {
+    // Calculate the expected end date based on the start date and duration
+    const expectedEndDate = new Date(startDate);
+    expectedEndDate.setDate(startDate.getDate() + duration);
+
+    if (endDate.toDateString() !== expectedEndDate.toDateString()) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const formattedStartDate = startDate.toLocaleDateString(undefined, options); // Format the start date as "day, month year"
+        end_dateValidationMessage.textContent = `End date should be ${formattedStartDate} + ${duration} days.`;
+    } else {
+        end_dateValidationMessage.textContent = '';
+    }
+} else {
+    // If duration is not a valid number, don't perform the validation
+    end_dateValidationMessage.textContent = '';
+}
+
+}
+
+        
+        function validateAccommodation() {
+            if (accommodationInput.value === '') {
+                accommodationValidationMessage.textContent = 'Accommodation selection is required.';
+            } else {
+                accommodationValidationMessage.textContent = '';
+            }
+        }
+    
+        function validateTransportation() {
+            if (transportationInput.value.trim() === '') {
+                transportationValidationMessage.textContent = 'Transportation is required.';
+            } else {
+                transportationValidationMessage.textContent = '';
+            }
+        }
+    
+        function validateActivities() {
+            if (activitiesInput.value.trim() === '') {
+                activitiesValidationMessage.textContent = 'Activities description is required.';
+            } else {
+                activitiesValidationMessage.textContent = '';
+            }
+        }
+function validateImages() {
+    // You can add custom validation rules for the images field here
+    // Example: Check if the uploaded images meet specific criteria.
+}
+
+function validateCategory() {
+    if (categoryInput.value.trim() === '') {
+        categoryValidationMessage.textContent = 'Category is required.';
+    } else {
+        categoryValidationMessage.textContent = '';
+    }
+}
+
+function validateTags() {
+    if (tagsInput.value.trim() === '') {
+        tagsValidationMessage.textContent = 'Tags are required.';
+    } else {
+        tagsValidationMessage.textContent = '';
+    }
+}
+
+
+function validateAvailability() {
+    if (isNaN(availabilityInput.value) || parseInt(availabilityInput.value) < 1) {
+        availabilityValidationMessage.textContent = 'Availability must be a positive number.';
+    } else {
+        availabilityValidationMessage.textContent = '';
+    }
+}
+
+function validateBookingDeadline() {
+    const startDate = new Date(start_dateInput.value);
+    const bookingDeadline = new Date(booking_deadlineInput.value);
+
+    const oneDay = 24 * 60 * 60 * 1000; // One day in milliseconds
+
+    if (bookingDeadline >= startDate || startDate - bookingDeadline < oneDay) {
+        booking_deadlineValidationMessage.textContent = 'Booking deadline should be one day prior to the start date.';
+    } else {
+        booking_deadlineValidationMessage.textContent = '';
+    }
+}
+
+
+function validateCancellationPolicy() {
+    if (cancellation_policyInput.value.trim() === '') {
+        cancellation_policyValidationMessage.textContent = 'Cancellation policy is required.';
+    } else {
+        cancellation_policyValidationMessage.textContent = '';
+    }
+}
+    
+        // Add more validation functions for the other new fields as needed
+    </script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+
+    <!-- Add your CSS stylesheets and JavaScript files here -->
+    <style>
+        /* Basic styling for the sidebar */
+/* Style for the table container */
+.table-container {
+    margin-left: 300px; /* Adjust the margin to position the table to the right of the sidebar */
+    padding: 20px;
+}
+
+/* Style for the table */
+table {
+    width: 90%; /* Increase the table width */
+    margin: 20px auto; /* Center the table horizontally */
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px; /* Increase padding for better spacing */
+    text-align: left;
+}
+
+th {
+    background-color: #333;
+    color: #fff;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+    transition: background-color 0.3s; /* Add hover transition effect */
+}
+
+/* Add hover effect on table rows */
+tr:hover {
+    background-color: #ddd;
+}
+     .sidebar {
+            background-color: #113156;
+            color: white;
+            position: fixed;
+            width: 250px;
+            height: 100%;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 15px; /* Increase padding to make the links larger */
+            font-size: 18px; /* Increase font size for links */
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #cd1100;
+        }
+
+        /* Styling for the profile picture */
+        .profile-picture {
+            width: 120px; /* Increase the profile picture size */
+            height: 120px; /* Increase the profile picture size */
+            border-radius: 50%;
+            margin: 20px auto;
+            background-color: #fff;
+            background-image: url("{% static 'Niwi_Travels/images/niwilogo.jpg' %}");
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Adjust main content to account for the sidebar */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .h1{
+            text-align: center;
+            justify-content: center;
+        }
+        .navbar {
+    background-color: #007BFF; /* Set your desired background color */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for separation */
+}
+
+/* Style for the h1 in the navbar */
+.navbar h1 {
+    margin: 0;
+    font-size: 24px; /* Adjust the font size */
+}
+
+/* Style for the p in the navbar */
+.navbar p {
+    margin: 0;
+    font-size: 16px; /* Adjust the font size */
+}
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="profile-picture"></div>
+        <a href="/admins" id="logout-link">Home</a>
+        <a href="#">Total Travellers ({{ user_count }})</a>   
+        <!-- <a href="/logout" id="logout-link">Logout</a> -->
+    </div>
+        
+    <div class="navbar">
+        <h1>Welcome Admin</h1>
+        <p>This is where you can manage users, packages, and ongoing trips.</p>
+    </div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1>Showing the List of Traveler Users</h1>
+    </div>
+    
+    <div class="table-container">
+        <main>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <!-- Add more user attributes as needed -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_profile in user_profiles %}
+                        <tr>
+                            <td>{{ user_profile.username }}</td>
+                            <td>{{ user_profile.email }}</td>
+                            <!-- Add more user attributes as needed -->
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </main>
+        <div class="pagination">
+            <span class="step-links">
+                {% if user_profiles.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ user_profiles.previous_page_number }}">previous</a>
+                {% endif %}
+                
+                <span class="current">
+                    Page {{ user_profiles.number }} of {{ user_profiles.paginator.num_pages }}.
+                </span>
+                
+                {% if user_profiles.has_next %}
+                    <a href="?page={{ user_profiles.next_page_number }}">next</a>
+                    <a href="?page={{ user_profiles.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+        <div class="back-button">
+            <a href="/admins" class="button">Back</a>
+        </div>
+    </div>
+    <!-- ... (your existing code) ... -->
+    <script>
+        // Wait for the document to be fully loaded
+        document.addEventListener("DOMContentLoaded", function () {
+            // Find the logout button by its ID
+            var logoutButton = document.getElementById("logout-link");
+    
+            // Add a click event listener to the logout button
+            logoutButton.addEventListener("click", function () {
+                // Reload the page after a short delay (you can adjust the delay as needed)
+                setTimeout(function () {
+                    location.reload();
+                }, 1000); // Reload after 1 second (1000 milliseconds)
+            });
+        });
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+    // Find the Next button by its ID
+    var nextButton = document.getElementById("next-button");
+
+    // Add a click event listener to the Next button
+    nextButton.addEventListener("click", function () {
+        // Get the current page number from the URL (if present)
+        var currentPage = parseInt(new URLSearchParams(window.location.search).get('page')) || 1;
+
+        // Calculate the next page number
+        var nextPage = currentPage + 1;
+
+        // Update the URL with the new page number
+        var newUrl = window.location.pathname + "?page=" + nextPage;
+
+        // Redirect to the new URL
+        window.location.href = newUrl;
+    });
+});
+    </script>
+    <!-- Add your JavaScript scripts here, if needed -->
+</body>
+</html>

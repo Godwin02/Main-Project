@@ -1,0 +1,322 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Travel Package</title>
+    <!-- Include any CSS stylesheets or JavaScript files here -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+</head>
+<style>
+.sidebar {
+    background-color: #113156;
+    color: white;
+    position: fixed;
+    width: 250px;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding-top: 20px;
+    overflow-y: hidden; /* Hide the main scrollbar in the sidebar */
+}
+    .sidebar a {
+        color: white;
+        text-decoration: none;
+        display: block;
+        padding: 15px;
+        font-size: 18px;
+        transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+        background-color: #cd1100;
+    }
+
+    .main-content {
+    margin-left: 250px;
+    padding: 20px;
+    overflow-y: auto; /* Enable vertical scrollbar for the main content */
+}
+
+    /* Styling for the profile picture */
+    .profile-picture {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 20px auto;
+        background-color: #fff;
+        background-image: url("{% static 'Niwi_Travels/images/niwilogo.jpg' %}");
+        background-size: cover;
+        background-position: center;
+    }
+
+    /* Styles for the form */
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f7f7f7;
+        margin: 0;
+        padding: 0;
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+    }
+
+    .package-form {
+        width: 60%;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+        width: 100%;
+    }
+
+    .form-group {
+        margin: 10px 0;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="url"],
+    textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    textarea {
+        height: 100px;
+    }
+    select#accommodation {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    /* Add this CSS to style the options within the "Status" dropdown */
+    select#accommodation option {
+        background-color: #fff;
+        color: #333;
+    }
+    select#status {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    /* Add this CSS to style the options within the "Status" dropdown */
+    select#status option {
+        background-color: #fff;
+        color: #333;
+    }
+
+
+    .submit-button {
+        background-color: #007BFF;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .submit-button:hover {
+        background-color: #0056b3;
+    }
+    .navbar {
+    background-color: #007BFF; /* Set your desired background color */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for separation */
+}
+
+/* Style for the h1 in the navbar */
+.navbar h1 {
+    margin: 0;
+    font-size: 24px; /* Adjust the font size */
+}
+
+/* Style for the p in the navbar */
+.navbar p {
+    margin: 0;
+    font-size: 16px; /* Adjust the font size */
+}
+.scrollable-content {
+    height: calc(100% - 20px); /* Adjust the height as needed */
+    overflow-y: auto; /* Enable vertical scrollbar for the scrollable content */
+}
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+input[type="submit"] {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+</style>
+<body>
+    <div class="sidebar">
+        <div class="scrollable-content">
+
+        <div class="profile-picture"></div>
+        <a href="/admins" id="logout-link">Home</a>
+        <a href="{% url 'user_list' %}">Users </a>  
+        <a href="/travellers">Travellers</a>
+        <a href="/drivers">Drivers</a> 
+        <a href="/upload_package">Add Package</a>
+        <a href="/view-packages">View Package</a>
+        <a href="/bookings">Upcoming Journeys</a>
+        <a href="/ongoing-bookings" id="logout-link">Ongoing Journeys</a>
+        <a href="/history-bookings">History Journeys</a>
+        <a href="/logout" id="logout-link">Logout</a> 
+        </div>
+    </div>
+    <div class="navbar">
+        <h1>Welcome Admin</h1>
+        <p>This is where you can manage users, packages, and ongoing trips.</p>
+    </div>
+    <div class="main-content">
+        <h2>Edit Custom Package</h2>
+    
+        <form method="post" action="{% url 'edit_custom_package' package.id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+    
+            <!-- Travel Package Information -->
+            <div class="package-form">
+                <h3>Travel Package Information</h3>
+                <div class="form-group">
+                    <label for="id_category">Category:</label>
+                    <select name="category" id="id_category">
+                        <option value="Honeymoon" {% if package.category == 'Honeymoon' %}selected{% endif %}>Honeymoon</option>
+                        <option value="Adventure" {% if package.category == 'Adventure' %}selected{% endif %}>Adventure</option>
+                        <option value="Family" {% if package.category == 'Family' %}selected{% endif %}>Family</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="id_name">Name:</label>
+                    <input type="text" name="name" id="id_name" value="{{ package.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_description">Description:</label>
+                    <textarea name="description" id="id_description" required>{{ package.description }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="id_days">Days:</label>
+                    <input type="number" name="days" id="id_days" value="{{ package.days }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_nights">Nights:</label>
+                    <input type="number" name="nights" id="id_nights" value="{{ package.nights }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_price">Price:</label>
+                    <input type="number" name="price" id="id_price" value="{{ package.price }}" required>
+                </div>
+                <div class="form-group">
+                    {% if package.package_image %}
+                        <div class="image-preview">
+                            <img src="{{ package.package_image.url }}" alt="Package Image" style="max-height: 200px; max-width: 200px;">
+                        </div>
+                    {% endif %}
+                    <label for="id_new_package_image">Change Package Image:</label>
+                    <input type="file" name="new_package_image" id="id_new_package_image" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label for="id_status">Status:</label>
+                    <select name="status" id="id_status">
+                        <option value="Post" {% if package.status == 'Post' %}selected{% endif %}>Post</option>
+                        <option value="Save" {% if package.status == 'Save' %}selected{% endif %}>Save</option>
+                    </select>
+                </div>
+                
+                
+            </div>
+    
+            <!-- Days Information -->
+            <div class="package-form" id="days-information">
+                <h3>Days Information</h3>
+                {% if days %}
+                    <p>Days variable is not empty.</p>
+                    {% for day in days %}
+                        <div class="formset-form">
+                            <div class="form-group">
+                                <label for="day_image_{{ day.day_number }}">Day {{ day.day_number }} Image:</label>
+                                <input type="file" name="day_image_{{ day.day_number }}" id="day_image_{{ day.day_number }}" accept="image/*">
+                            </div>
+                            <div class="form-group">
+                                <label for="day_image_description_{{ day.day_number }}">Day {{ day.day_number }} Image Description:</label>
+                                <textarea name="day_image_description_{{ day.day_number }}" id="day_image_description_{{ day.day_number }}" required>
+                                    {{ day.image_description }}
+                                </textarea>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>Days variable is empty.</p>
+                {% endif %}
+            </div>
+            
+            
+            
+    
+            <input type="submit" value="Update Package">
+        </form>
+    </div>
+    
+    <!-- Script for dynamic image fields -->
+    <script>
+        function generateDynamicFields() {
+            $('#days-information').empty();
+    
+            var numberOfDays = $('#id_days').val();
+    
+            for (var i = 1; i <= numberOfDays; i++) {
+                var dynamicFieldHTML = `
+                    <div class="formset-form">
+                        <div class="form-group">
+                            <label for="day_image_${i}">Day ${i} Image:</label>
+                            <input type="file" name="day_image_${i}" id="day_image_${i}" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <label for="day_image_description_${i}">Day ${i} Image Description:</label>
+                            <textarea name="day_image_description_${i}" id="day_image_description_${i}" required></textarea>
+                        </div>
+                    </div>
+                `;
+                $('#days-information').append(dynamicFieldHTML);
+            }
+        }
+    
+        $('#id_days').on('change', generateDynamicFields);
+        generateDynamicFields();
+    </script>
+    
+    </body>
+    </html>

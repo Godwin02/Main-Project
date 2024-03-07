@@ -1,0 +1,124 @@
+
+    {% load static %}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Honeymoon Packages</title>
+        <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+        <link rel="stylesheet" href="{% static 'Niwi_Travels/css/style.css' %}">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+    <style>
+    h1 {
+                font-size: 24px;
+                text-align: center;
+                margin: 20px 0;
+                color: #333;
+            }
+
+            /* Card styles */
+            .card {
+                border: 1px solid #ccc;
+                border-radius: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                transition: transform 0.2s;
+                margin-bottom: 20px;
+            }
+
+            /* Hover effect for the card */
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+            /* Image styles within the card */
+            .card-img-top {
+                width: 100%;
+                height: 200px; /* Set the desired height */
+                object-fit: cover;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+            }
+
+            /* Card title styles */
+            .card-title {
+                font-size: 1.25rem;
+                font-weight: bold;
+            }
+
+            /* Card text styles */
+            .card-text {
+                font-size: 1rem;
+            }
+
+            /* "No upcoming journeys found" message styles */
+            .no-journeys {
+                font-size: 1.25rem;
+                text-align: center;
+                margin: 20px 0;
+            }
+
+
+    </style>
+    </head>
+    <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+        
+        <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light site-navbar-target" id="ftco-navbar">
+            <div class="container">
+                <img src="{% static 'Niwi_Travels/images/niwilogo.jpg' %}" alt="Logo" width="40px" height="35px"> <a class="navbar-brand" href="#">NIWI TRAVELS</a>
+
+
+            <div class="collapse navbar-collapse" id="ftco-nav">
+                <ul class="navbar-nav nav ml-auto">
+                    
+                <li class="nav-item"><a href="/thome" class="nav-link"><span style="color: #fff;">Home</span></a></li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" style="color: #fff;">
+                        {{ user.username }}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="/upcoming-journeys" id="#" style=" background-color: rgb(42, 165, 67);text-align: center; margin-top: 10px;">Upcoming Journeys</a>
+                        <a class="dropdown-item" href="/ongoing-journeys" id="#" style=" background-color: rgb(218, 180, 13);text-align: center; margin-top: 10px;">Ongoing Trips</a>
+                        <a class="dropdown-item" href="/history-journeys" id="#" style=" background-color: rgb(234, 0, 0);text-align: center;margin-top: 10px">History</a>
+                        <a class="dropdown-item" href="/viewprofileT" style=" background-color: rgb(151, 140, 245);text-align: center;margin-top: 10px">View Profile</a>
+                        <a class="dropdown-item" href="/tupdate" id="#" style=" background-color: rgb(195, 67, 172);text-align: center;margin-top: 10px">Update Profile</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/logout" id="logout-link" style="color: rgb(255, 0, 0); background-color: rgb(40, 38, 38); text-align: center;margin-top: 10px">Logout</a>
+                    </div>
+                </li>
+                </ul>
+                
+            </div>
+            </div>
+        </nav>
+    <br><br>   
+    <h2 style="text-align: center;">Honeymoon Packages</h2>
+{% if honeymoon_packages %}
+<div class="row">
+    {% for package in honeymoon_packages %}
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <a href="{% url 'custom_package_detail' package.id %}">
+            {% if package.package_image %}
+            <img src="{{ package.package_image.url }}" class="card-img-top" alt="{{ package.name }} Image">
+            {% else %}
+            <img src="{% static 'placeholder-image.jpg' %}" class="card-img-top" alt="Placeholder Image">
+            {% endif %}
+        </a>
+            <div class="card-body">
+                <h5 class="card-title" style="text-align: center;">{{ package.name }}</h5>
+                <!-- Add other package details as needed -->
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No honeymoon packages available.</p>
+{% endif %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> 
+</body>
+</html>
