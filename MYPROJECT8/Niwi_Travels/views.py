@@ -1736,6 +1736,9 @@ def edit_custom_package(request, package_id):
 def add_custom_passenger(request, package_id):
     package = get_object_or_404(CustomPackage, id=package_id)
     if request.method == 'POST':
+        if package is None:
+            return HttpResponse("Package is E")
+        print(package.pk)
         user_id = request.user.id
         package_id = package_id
         boarding = request.POST.get('boarding_point')
@@ -1779,15 +1782,14 @@ def add_custom_passenger(request, package_id):
                 )
                 passenger.save()
 
-            messages.success(request, "Your Booking Procedures have been Initialized. Stay Connected for getting further Updates.")
-            return render(request, 'add_custom_passenger.html', {'package': package, 'package_id': package_id})
-            
+            messages.success(request, "Your Booking Procedures have been Initialized. Stay Connected for getting further Updates.") 
+            return redirect('thome')            
 
         else:
             # Handle the case where the number of entries in lists don't match
             messages.success(request, "Upload ID Proof of Number of Passengers Entered for Booking.")
-
-    return render(request, 'add_custom_passenger.html', {'package': package, 'package_id': package_id})
+    else:
+        return render(request, 'add_custom_passenger.html', {'package': package, 'package_id': package_id})
 
 
 
@@ -1821,7 +1823,7 @@ def custom_package_requests(request, package_id):
 
     user_details = []
     for booking in pending_bookings:
-        passengers_info = CustomPassenger.objects.filter(package=booking.package, user=booking.user, status='Confirmed').values(
+        passengers_info = CustomPassenger.objects.filter(package=booking.package, user=booking.user, booking=booking.pk).values(
             'passenger_name', 'passenger_age'
         )        
         user_details.append({
@@ -2049,3 +2051,9 @@ def predict_elevation_view(request):
     # Render a response using a template
     return render(request, 'upload_image.html', {'predicted_elevation': predicted_elevation, 'uploaded_image': uploaded_image_base64})
 
+def testpage_view(request):
+    user = User.objects.get(id=request.user.id)
+    context ={
+        "user": user
+    }
+    return render(request, "test.html", context)

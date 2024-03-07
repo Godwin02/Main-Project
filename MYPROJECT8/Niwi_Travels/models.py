@@ -5,7 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-class User(AbstractUser):
+class User(AbstractUser): 
     is_traveller = models.BooleanField(default=True)
     is_driver = models.BooleanField(default=False)
     

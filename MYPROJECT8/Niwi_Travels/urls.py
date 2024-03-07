@@ -100,6 +100,7 @@ urlpatterns = [
     path('search/', views.search_and_store_place, name='search_and_store_place'),
     path('get_place_suggestions/', views.get_place_suggestions, name='get_place_suggestions'),
     path('update_custom_booking_status/<int:user_id>/<int:package_id>/', views.update_custom_booking_status, name='update_custom_booking_status'),
+    path('testpage/', views.testpage_view, name='testpage'),
 
 
 

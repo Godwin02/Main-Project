@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+</head>
+<body>
+    <h1>{{user.username}}</h1> 
+    {% for i in user.custombooking_set.all %}
+    <h5>{{ i.package.name }}</h5>
+    {% for j in i.package.custompassenger_set.all %}
+    <h1>hello</h1>
+    {% endfor %}
+    {% endfor %}
+    <h4></h4>
+</body>
+</html>

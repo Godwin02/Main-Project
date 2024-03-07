@@ -246,19 +246,17 @@
     </div>
   </div>
   {% endif %}
-  <form method="POST" action="{% url 'add_custom_passenger' package.id %}">
-    <input type="hidden" name="package.id" value="{{ package.id }}">
+    <input type="hidden" name="package.id" value="{{ package.id }}"> 
     {% csrf_token %}
     {% if user.is_authenticated %}
     {% if not passenger %}
     {% if not from_upcoming_journeys %}
-    <button type="submit">Book Now</button>
+    <a href="{% url 'add_custom_passenger' package.id %}">Book Now</a>
     {% endif %}
     {% endif %}
     {% else %}
     <a href="/log">Click Here to Login and Book Your Destination Soon.</a>
     {% endif %}
-</form>
 </div>
 </div>
 
