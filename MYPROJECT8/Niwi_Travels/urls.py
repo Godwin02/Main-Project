@@ -92,7 +92,7 @@ urlpatterns = [
     path('verified_custom_bookings/',views.verified_custom_bookings,name='verified_custom_bookings'),
     path('verified_custom_users/<int:package_id>/',views.verified_custom_users,name='verified_custom_users'),
     path('custom_passengers/<int:booking_id>/', views.custom_passengers, name='custom_passengers'),
-    path('custom_passenger_details/<int:package_id>/', views.custom_passenger_details, name='custom_passenger_details'),
+    path('custom_passenger_details/<int:booking_id>/', views.custom_passenger_details, name='custom_passenger_details'),
     path('delete_custom_passenger/<int:passenger_id>/', views.delete_custom_passenger, name='delete_custom_passenger'),
     path('predict_elevation/', views.predict_elevation_view, name='predict_elevation'),
 

@@ -854,11 +854,11 @@ def upcoming_journeys(request):
 
 
 
-    upcoming_custom_journeys = CustomPackage.objects.filter(
-        custom_bookings__user=user,
-        custom_bookings__start_date__gt=current_date,
-        custom_bookings__status='Pending',
-    ).distinct()
+    upcoming_custom_journeys = CustomBooking.objects.filter(
+        user=user,
+        status='Pending',
+        start_date__gt=current_date
+    ).order_by('start_date')
 
     return render(request, 'upcoming_journeys.html',  {'packages_with_images': packages_with_images,'upcoming_custom_journeys':upcoming_custom_journeys})
 @never_cache
@@ -1973,12 +1973,12 @@ def update_custom_booking_status(request, user_id, package_id):
 
 @never_cache
 @login_required(login_url='log')
-def custom_passenger_details(request, package_id):
+def custom_passenger_details(request, booking_id):
     user=request.user
-    package = get_object_or_404(CustomPackage, id=package_id)
-    passengers = CustomPassenger.objects.filter(package=package,user=user)
+    booking = get_object_or_404(CustomBooking, id=booking_id)
+    passengers = CustomPassenger.objects.filter(booking=booking,user=user)
     
-    return render(request, 'custom_passenger_details.html', {'package': package, 'passengers': passengers})
+    return render(request, 'custom_passenger_details.html', {'package': booking, 'passengers': passengers})
 
 
 @never_cache
