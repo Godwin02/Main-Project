@@ -202,7 +202,7 @@ tr:hover {
                 <td>{{ user_detail.children }}</td>
                 <td>{{ user_detail.status }}</td>
                 <td>
-                    <form method="post" action="{% url 'update_custom_booking_status' user_detail.user.id user_detail.package_id %}">
+                    <form method="post" action="{% url 'update_custom_booking_status' user_detail.user.id user_detail.booking_id %}">
                         {% csrf_token %}
                         <select name="status">
                             <option value="Pending" {% if user_detail.status == 'Pending' %}selected{% endif %}>Pending</option>

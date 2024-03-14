@@ -120,6 +120,35 @@
         {% endfor %}
 </div>
     
+
+<h1> Ongoing Custom Journeys</h1>
+
+{% if ongoing_custom_journeys %}
+    <div class="row">
+        {% for journey in ongoing_custom_journeys %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <a href="{% url 'custom_package_detail' journey.package.id %}">
+                        {% if journey.package.package_image %}
+                            <img src="{{ journey.package.package_image.url }}" class="card-img-top" alt="Package Image">
+                        {% else %}
+                            <img src="{% static 'path_to_default_image.jpg' %}" class="card-img-top" alt="Default Image">
+                        {% endif %}
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ journey.package.name }}</h5>
+                        <p class="card-text">Category: {{ journey.package.category }}</p>
+                        <p class="card-text">Start Date: {{ journey.start_date }}</p>
+                        <p class="card-text">Boarding: {{ journey.boarding }}</p>
+                        <!-- Add more details as needed -->
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No confirmed ongoing journeys found.</p>
+{% endif %}
     </body>
     </html>      
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

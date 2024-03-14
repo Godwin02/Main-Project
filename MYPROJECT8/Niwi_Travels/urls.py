@@ -96,6 +96,7 @@ urlpatterns = [
     path('delete_custom_passenger/<int:passenger_id>/', views.delete_custom_passenger, name='delete_custom_passenger'),
     path('predict_elevation/', views.predict_elevation_view, name='predict_elevation'),
     path('submit_custom_rating/<int:booking_id>/<int:stars>/', views.submit_custom_rating, name='submit_custom_rating'),
+    path('cancel_custom_booking/<int:booking_id>/', views.cancel_custom_booking, name='cancel_custom_booking'),
 
 
     path('search/', views.search_and_store_place, name='search_and_store_place'),

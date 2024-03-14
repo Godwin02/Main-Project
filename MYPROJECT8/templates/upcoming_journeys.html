@@ -166,6 +166,19 @@
                             </a>
                         </p>
                         <!-- Add more details as needed -->
+                        {% if user.is_authenticated %}
+                    <form method="POST" action="{% url 'cancel_custom_booking' journey.id %}">
+                        {% csrf_token %}
+                        <button type="submit" name="cancel" class="btn btn-danger">Cancel Booking</button>
+                    </form>
+                    {% if journey.status == 'Confirmed' %}
+                    <!-- Display a payment button only if the booking status is "Confirmed" -->
+                    <form method="POST" action="{% url 'payment' booking_id=package_with_images.booking.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">Make Payment</button>
+                    </form>
+                {% endif %}
+                {% endif %}
                     </div>
                 </div>
             </div>

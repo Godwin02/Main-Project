@@ -1,6 +1,6 @@
 from dataclasses import fields
 from itertools import count
-from django.forms import ValidationError
+from django.forms import DateField, DurationField, ValidationError
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
@@ -652,7 +652,7 @@ def upload_package(request):
 
 
 
-from datetime import date, timezone
+from datetime import date, timedelta, timezone
 
 @never_cache
 @login_required(login_url='log')
@@ -944,6 +944,10 @@ def history_journeys(request):
 
     return render(request, 'history_journeys.html', {'packages_with_images': packages_with_images,'history_custom_journeys':history_custom_journeys,'c_rating':c_rating})
 
+
+from django.db.models import F, ExpressionWrapper
+from django.db.models.fields import DateField
+from datetime import timedelta
 @never_cache
 @login_required(login_url='log')
 def ongoing_journeys(request):
@@ -973,7 +977,18 @@ def ongoing_journeys(request):
             'booking': booking,  # Include booking status in the dictionary
         })
 
-    return render(request, 'ongoing_journeys.html', {'packages_with_images': packages_with_images})
+
+    end_date_expression = F('start_date') + ExpressionWrapper(F('package__days'), output_field=DateField())
+
+# Filter the ongoing custom journeys
+    ongoing_custom_journeys = CustomBooking.objects.filter(
+    user=user,
+    status='Confirmed',
+    start_date__gte=current_date,
+    start_date__lte=end_date_expression
+    ).order_by('start_date')
+    print(current_date, F('start_date') + ExpressionWrapper(F('package__days'), output_field=DurationField()))
+    return render(request, 'ongoing_journeys.html', {'packages_with_images': packages_with_images,'ongoing_custom_journeys':ongoing_custom_journeys})
 
 
 from django.db import transaction
@@ -1017,7 +1032,11 @@ def cancel_booking(request, package_id):
 
 
 
-
+def cancel_custom_booking(request, booking_id):
+    booking=CustomBooking.objects.filter(pk=booking_id).first()
+    booking.status='Cancelled'
+    booking.save()
+    return redirect('upcoming_journeys')
 
 
 from django.contrib.admin.views.decorators import staff_member_required
@@ -1914,12 +1933,12 @@ def verified_custom_users(request, package_id):
 
     user_details = []
     for booking in confirmed_bookings:
-        passengers_info = CustomPassenger.objects.filter(package=booking.package, user=booking.user, status='Confirmed').values(
+        passengers_info = CustomPassenger.objects.filter(package=booking.package, user=booking.user, booking=booking.pk).values(
             'passenger_name', 'passenger_age'
-        )
+        )    
 
         user_details.append({
-            'booking_id': booking.id,
+            'booking_id': booking.pk,
             'user': booking.user,
             'boarding': booking.boarding,
             'start_date': booking.start_date,
@@ -1940,7 +1959,7 @@ from django.shortcuts import render, get_object_or_404
 #for admin  to view all passengers who have made a custom booking under a user for a particular package.
 def custom_passengers(request, booking_id):
     booking = get_object_or_404(CustomBooking, id=booking_id)
-    passengers = CustomPassenger.objects.filter(package=booking.package, user=booking.user)
+    passengers = CustomPassenger.objects.filter(package=booking.package,booking=booking, user=booking.user)
     
     return render(request, 'custom_passengers.html', {'passengers': passengers})
 
@@ -1977,10 +1996,10 @@ def get_place_suggestions(request):
 
     return JsonResponse(suggestions, safe=False)
 
-def update_custom_booking_status(request, user_id, package_id):
+def update_custom_booking_status(request, user_id, booking_id):
     if request.method == 'POST':
         status = request.POST.get('status')
-        package = CustomPackage.objects.get(pk=package_id)
+        package = CustomPackage.objects.get(booking=booking_id)
 
         if status == 'Pending':
             subject = f'Booking Status Update for Booking ID {package.name}'
@@ -1998,7 +2017,7 @@ def update_custom_booking_status(request, user_id, package_id):
             return render(request, 'invalid_status.html')  # Create this template
 
         # Use get() instead of filter() to get a single Booking instance
-        booking = CustomBooking.objects.filter(user_id=user_id, package_id=package_id).first()
+        booking = CustomBooking.objects.filter(user_id=user_id, pk=booking_id).first()
 
         if booking:
             # Update the booking status
