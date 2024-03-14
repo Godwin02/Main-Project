@@ -110,6 +110,11 @@
         </div>
       </nav>
 <br><br>
+{% if messages %}
+{% for message in messages %}
+{{ message }}
+ {% endfor %}   
+ {% endif %}
 <h2 style="text-align: center;">Passenger Details for {{ package.package_name }}</h2>
 
 <table class="table">

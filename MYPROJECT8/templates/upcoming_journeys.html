@@ -159,7 +159,7 @@
                         <h5 class="card-title">{{ journey.package.name }}</h5>
                         <p class="card-text">Category: {{ journey.package.category }}</p>
                         <p class="card-text">Start Date: {{ journey.start_date }}</p>
-                        <p class="card-text">Boarding: {{ journey.custom_bookings.first.boarding }}</p>
+                        <p class="card-text">Boarding: {{ journey.boarding }}</p>
                         <p class="card-text">
                             <a href="{% url 'custom_passenger_details' journey.id %}" class="view-details-link">
                                 View Passengers {{ journey.passenger_limit }}

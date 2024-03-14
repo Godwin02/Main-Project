@@ -859,6 +859,10 @@ def upcoming_journeys(request):
         status='Pending',
         start_date__gt=current_date
     ).order_by('start_date')
+    for booking in upcoming_custom_journeys:
+        if booking.passenger_limit <= 0:
+            booking.status='Cancelled'
+            booking.save()
 
     return render(request, 'upcoming_journeys.html',  {'packages_with_images': packages_with_images,'upcoming_custom_journeys':upcoming_custom_journeys})
 @never_cache
@@ -1987,7 +1991,7 @@ def delete_custom_passenger(request, passenger_id):
     passenger = get_object_or_404(CustomPassenger, id=passenger_id)
 
     # Get the related booking
-    booking = CustomBooking.objects.get(package=passenger.package, user=request.user)
+    booking = CustomBooking.objects.get(id=passenger.booking.id, user=request.user)
 
     # Delete the passenger
     passenger.delete()
@@ -1995,13 +1999,16 @@ def delete_custom_passenger(request, passenger_id):
     # Update passenger_limit in the Booking model
     booking.passenger_limit -= 1
     booking.save()
-
+    if booking.passenger_limit<=0:
+        booking.status='Cancelled'
+        booking.save()
+        messages.success(request,"Booking has been cancelled. No enough passengers")
     # Update availability in the TravelPackage model
-    passenger.package.save()
+    # passenger.save()
 
     # Redirect to the passenger details page or any other appropriate page
     # You can change 'passenger_details' to the actual URL pattern name for your passenger details view
-    return redirect('passenger_custom_details', package_id=passenger.package.id)
+    return redirect('custom_passenger_details', booking_id=passenger.booking.id)
 
 
 
