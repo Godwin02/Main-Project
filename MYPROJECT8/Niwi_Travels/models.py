@@ -252,3 +252,12 @@ class Place(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class CustomRating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    booking = models.ForeignKey(CustomBooking, on_delete=models.CASCADE, related_name='ratings')
+
+    stars = models.IntegerField(null=False, blank=False, default=0)
+
+    description = models.TextField(blank=True, null=True)

@@ -237,6 +237,141 @@
              </script>
         {% endfor %}
     </div>
+
+            <h1>History of Custom Journeys</h1>
+            <p style="font-size: 20px;font-weight: bold;">Stay Safe and Stay Connected. We are Happy to See You Soon.</p>
+            <div class="row">
+                {% for journey in history_custom_journeys %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <!-- Display the first image if available -->
+                            <a href="{% url 'custom_package_detail' journey.package.id %}">
+                                {% if journey.package.package_image %}
+                                <img src="{{ journey.package.package_image.url }}" class="card-img-top" alt="Package Image">
+                                {% else %}
+                                <img src="{% static 'path_to_default_image.jpg' %}" class="card-img-top" alt="Default Image">
+                                {% endif %}
+                            </a>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ journey.package.name }}</h5>
+                                <p class="card-text">Category: {{ journey.package.category }}</p>
+                                <p class="card-text">Start Date: {{ journey.start_date }}</p>
+                                <p class="card-text">Boarding: {{ journey.boarding }}</p>
+            
+                                <!-- Display rating in star format -->
+                                {% if c_rating %}
+
+                                {% for ratings_queryset in c_rating %}
+                                {% for rating in ratings_queryset %}
+                                    {% if rating.booking_id == journey.id %}
+                                    <!-- Display existing rating in filled star format -->
+                                    <label>Rating:</label>
+                                    <div class="star-rating" data-package-id="{{ journey.id }}">
+                                        {% for i in ''|rjust:rating.stars %}
+                                            {% if rating.stars|default:0 > i %}
+                                                <span class="star selected" data-rating="{{ i }}" onclick="handleStarClick('{{ journey.id }}', '{{ i }}')">&#9734;</span>
+                                            {% else %}
+                                                <span class="star" style="color: gold;" data-rating="{{ i }}" onclick="handleStarClick('{{ journey.id }}', '{{ i }}')">&#9733;</span>
+                                            {% endif %}
+                                        {% endfor %}
+
+
+                                        <form method="post" action="{% url 'submit_custom_rating' journey.id 0 %}">
+                                            {% csrf_token %}
+                                            <div>
+                                                <label for="rating">Edit your Rating:</label><br>
+                                                <input type="text" name="description" style="font-size: medium; font-family: 'Times New Roman', Times, serif; border-radius: 10px; border: 1px solid red;" id="description_input" value="{{ rating.description }}">
+                                            </div>
+                                            <div class="star-rating" data-package-id="{{ journey.id }}">
+                                                {% for i in ''|rjust:5 %}
+                                                    {% with forloop.counter as rating %}
+                                                        <span class="star" name="stars" id="star{{ journey.id }}_{{ rating }}" data-rating="{{ rating }}" onclick="handleStarClick('{{ journey.id }}', '{{ rating }}')" onmouseover="handleStarHover('{{ journey.id }}', '{{ rating }}')" onmouseout="handleStarMouseOut('{{ journey.id }}')">&#9733;</span>
+                                                    {% endwith %}
+                                                {% endfor %}
+                                                <input type="hidden" name="stars" id="stars_input_{{ journey.id }}" value=""><br>
+                                                <button type="submit">Submit Rating</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                                {% else %}
+                                    <!-- Add a form to submit a rating if not already rated -->
+                                    <form method="post" action="{% url 'submit_custom_rating' journey.id 0 %}">
+                                        {% csrf_token %}
+                                        <div>
+                                            <label>Your Experience with Niwi Travels:</label>
+                                            <input type="text" name="description" id="description_input" > 
+                                        </div>
+                                        <div class="star-rating" data-package-id="{{ journey.id }}">
+                                            {% for i in ''|rjust:5 %}
+                                                {% with forloop.counter as rating %}
+                                                    <span class="star" name="stars" id="star{{ journey.id }}_{{ rating }}" data-rating="{{ rating }}" onclick="handleStarClick('{{ journey.id }}', '{{ rating }}')" onmouseover="handleStarHover('{{ journey.id }}', '{{ rating }}')" onmouseout="handleStarMouseOut('{{ journey.id }}')">&#9733;</span>
+                                                {% endwith %}
+                                            {% endfor %}
+                                            <input type="hidden" name="stars" id="stars_input_{{ journey.id }}" value="">
+                                            <button type="submit">Submit Rating</button>
+                                        </div>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+
+            <script>
+                function handleStarClick(packageId, rating) {
+                 const stars = document.querySelectorAll(`[data-package-id="${packageId}"] .star`);
+
+                 stars.forEach((star, index) => {
+                     if (index < rating) {
+                         star.classList.add('selected');
+                     } else {
+                         star.classList.remove('selected');
+                     }
+                 });
+
+                     // Set the value of the hidden input to the selected rating
+                     const ratingInput = document.querySelector(`#stars_input_${packageId}`);
+                     ratingInput.value = rating;
+                 }
+
+                 
+                 function handleStarHover(packageId, rating) {
+                     const stars = document.querySelectorAll(`[data-package-id="${packageId}"] .star`);
+             
+                     stars.forEach((star, index) => {
+                         if (index < rating) {
+                             star.classList.add('hover');
+                         } else {
+                             star.classList.remove('hover');
+                         }
+                     });
+                 }
+                 
+                 function handleStarMouseOut(packageId) {
+                     const stars = document.querySelectorAll(`[data-package-id="${packageId}"] .star`);
+             
+                     stars.forEach((star) => {
+                         star.classList.remove('hover');
+                     });
+                 }
+
+                 function handleStarHover(packageId, rating) {
+                 for (let i = 1; i <= 5; i++) {
+                     const star = document.getElementById(`star${packageId}_${i}`);
+                     if (i <= rating) {
+                         star.style.color = "gold";
+                     } else {
+                         star.style.color = "";
+                     }
+                 }
+             }
+
+             </script>
+        {% endfor %}
+    </div>
     
     
     </body>

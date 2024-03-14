@@ -917,19 +917,32 @@ def history_journeys(request):
             ).first()
 
             # Retrieve images related to the travel package
-        package_images = PackageImage.objects.filter(package=booking.package)
-        rating = Rating.objects.filter(user=user, package=booking.package).first()
+        package_images = PackageImage.objects.filter(package=journey)
+        rating = Rating.objects.filter(user=user, package=journey).first()
 
             # Append the travel package, its images, and booking status to the list
         packages_with_images.append({
-                'package': booking.package,
+                'package': journey,
                 'images': package_images,
                 'booking': booking, 
                 'rating': rating,
  # Include booking status in the dictionary
             })
+    history_custom_journeys = CustomBooking.objects.filter(
+        user=user,
+        start_date__lt=current_date
+    ).order_by('start_date')
+    c_rating = []
 
-    return render(request, 'history_journeys.html', {'packages_with_images': packages_with_images})
+# Iterate over each booking
+    for journey in history_custom_journeys:
+        # Fetch all ratings for the current booking
+        ratings = CustomRating.objects.filter(user=user, booking=journey)
+        # Add the ratings to the list
+        c_rating.append(ratings)
+    print("here",c_rating)
+
+    return render(request, 'history_journeys.html', {'packages_with_images': packages_with_images,'history_custom_journeys':history_custom_journeys,'c_rating':c_rating})
 
 @never_cache
 @login_required(login_url='log')
@@ -1542,6 +1555,35 @@ def submit_rating(request, package_id, stars):
         return redirect(history_journeys)
 
     return redirect(history_journeys)
+
+
+def submit_custom_rating(request, booking_id, stars):
+    if request.method == 'POST':
+        user = request.user
+        booking = CustomBooking.objects.get(pk=booking_id)
+
+        # Check if the form data is valid
+
+        if not request.POST.get('stars') or not request.POST.get('description'):
+            messages.error(request, 'Please select a rating and provide a description')
+            return redirect(history_journeys)
+
+        # Retrieve rating from the form data
+        rating_value = request.POST.get('stars')
+
+        # Check if the user has already rated the package
+        try:
+            rating = CustomRating.objects.get(user=user, booking=booking)
+            rating.stars = rating_value
+            rating.description = request.POST.get('description', '')
+            rating.save()
+        except CustomRating.DoesNotExist:
+            rating = CustomRating.objects.create(user=user, booking=booking, stars=rating_value, description=request.POST.get('description', ''))
+
+        return redirect(history_journeys)
+
+    return redirect(history_journeys)
+
 
 from django.template.loader import render_to_string
 from reportlab.pdfgen import canvas
