@@ -97,11 +97,15 @@ urlpatterns = [
     path('predict_elevation/', views.predict_elevation_view, name='predict_elevation'),
     path('submit_custom_rating/<int:booking_id>/<int:stars>/', views.submit_custom_rating, name='submit_custom_rating'),
     path('cancel_custom_booking/<int:booking_id>/', views.cancel_custom_booking, name='cancel_custom_booking'),
+    path('custom_payment/<int:booking_id>/', views.custom_payment, name='custom_payment'),
+    path('custom_pay/<int:booking_id>/', views.custom_pay, name='custom_pay'),
+    path('custom_success/<int:booking_id>/',views.custom_success, name='custom_success'),
+    path('download_custom_receipt/<int:booking_id>/', views.download_custom_receipt, name='download_custom_receipt'),
 
 
     path('search/', views.search_and_store_place, name='search_and_store_place'),
     path('get_place_suggestions/', views.get_place_suggestions, name='get_place_suggestions'),
-    path('update_custom_booking_status/<int:user_id>/<int:package_id>/', views.update_custom_booking_status, name='update_custom_booking_status'),
+    path('update_custom_booking_status/<int:user_id>/<int:booking_id>/', views.update_custom_booking_status, name='update_custom_booking_status'),
     path('testpage/', views.testpage_view, name='testpage'),
 
 
