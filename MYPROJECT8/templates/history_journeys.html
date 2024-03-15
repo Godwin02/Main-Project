@@ -257,12 +257,7 @@
                                 <p class="card-text">Category: {{ journey.package.category }}</p>
                                 <p class="card-text">Start Date: {{ journey.start_date }}</p>
                                 <p class="card-text">Boarding: {{ journey.boarding }}</p>
-            {% if journey.status == 'Cancelled' %}
-            <p class="card-text">Booking was Cancelled</p>
-            {% elif journey.status == 'Pending' %}
-            <p class="card-text">Booking was not completed</p>
-            {% else %}
-
+            
                                 <!-- Display rating in star format -->
                                 {% if c_rating %}
 
@@ -322,7 +317,6 @@
                                 {% endif %}
                             </div>
                         </div>
-                    {% endif %}
                     </div>
 
 

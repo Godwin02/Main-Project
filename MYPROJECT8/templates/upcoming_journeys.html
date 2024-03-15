@@ -173,7 +173,7 @@
                     </form>
                     {% if journey.status == 'Confirmed' %}
                     <!-- Display a payment button only if the booking status is "Confirmed" -->
-                    <form method="POST" action="{% url 'custom_payment' booking_id=journey.id %}">
+                    <form method="POST" action="{% url 'payment' booking_id=package_with_images.booking.id %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-success">Make Payment</button>
                     </form>
