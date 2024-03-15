@@ -821,6 +821,8 @@ def add_passenger(request, package_id):
 from django.shortcuts import render
 from .models import TravelPackage
 from django.utils import timezone
+from django.db.models import Q
+
 @never_cache
 @login_required(login_url='log')
 def upcoming_journeys(request):
@@ -856,9 +858,10 @@ def upcoming_journeys(request):
 
     upcoming_custom_journeys = CustomBooking.objects.filter(
         user=user,
-        status='Pending',
+        status__in=['Confirmed', 'Pending'],  # Use status__in to filter by multiple statuses
         start_date__gt=current_date
     ).order_by('start_date')
+
     for booking in upcoming_custom_journeys:
         if booking.passenger_limit <= 0:
             booking.status='Cancelled'
@@ -1453,6 +1456,29 @@ def payment(request, booking_id):
     return render(request, 'payment.html', {'booking': booking, 'travel_package': travel_package, 'total_amount': total_amount, 'gst_amount': gst_amount, 'final_price': final_price, 'payment': payment})
 
 
+@never_cache
+@login_required(login_url='log')
+def custom_payment(request, booking_id):
+    booking = get_object_or_404(CustomBooking, pk=booking_id)
+    payment = CustomPayment.objects.filter(booking=booking).first()
+
+    # Get the TravelPackage instance associated with the booking
+    travel_package = booking.package
+    total_amount = travel_package.price * booking.passenger_limit
+
+    # Calculate GST amount
+    gst_rate = Decimal('0.15')  # 15% GST rate
+    gst_amount = total_amount * gst_rate
+
+    # Calculate final price including GST
+    final_price = total_amount + gst_amount
+
+    # You can include any payment processing logic here if needed
+
+    return render(request, 'custom_payment.html', {'booking': booking, 'travel_package': travel_package, 'total_amount': total_amount, 'gst_amount': gst_amount, 'final_price': final_price, 'payment': payment})
+
+
+
 
 import razorpay
 from django.views.decorators.csrf import csrf_exempt
@@ -1484,6 +1510,35 @@ def pay(request,booking_id):
 
     return HttpResponse("Invalid request")
 
+
+def custom_pay(request,booking_id):
+    flag=0
+    
+    if request.method == 'POST':
+        book = get_object_or_404(CustomBooking, pk=booking_id)
+        client = razorpay.Client(auth=("rzp_test_PvsGkN41iQ2AJL", "6RXQIZzmrKaWRPW2tUuBbiP6"))
+        travel_package = book.package
+        total_amount = travel_package.price * book.passenger_limit
+        gst_rate = Decimal('0.15')  # 15% GST rate
+        gst_amount = total_amount * gst_rate
+
+        # Calculate final price including GST
+        final_price = total_amount + gst_amount
+        book_amount = int(final_price* 100)  # Example amount
+        data = {
+            "amount": book_amount,
+            "currency": "INR",
+            "receipt": f"order_rcptid_{booking_id}"  # Use order ID to generate a unique receipt ID
+        }
+        payment = client.order.create(data=data)
+        if payment:
+            # Save the payment details to your database or perform any necessary action
+
+            # Render the pay.html page with payment details
+            return render(request, 'custom_pay.html', {'payment': payment, 'order': book})
+
+    return HttpResponse("Invalid request")
+
 def success(request,booking_id):
     book = get_object_or_404(Booking, pk=booking_id)
     travel_package = book.package
@@ -1503,6 +1558,34 @@ def success(request,booking_id):
         }
     payment = client.order.create(data=data)
     new_payment = Payment(
+            booking=book,
+            razor_pay_order_id=payment['id'],
+            amount=book_amount,
+            is_paid=True,
+            user=request.user  # Assuming the user is authenticated and initiating the payment
+        )
+    new_payment.save()
+    return redirect('/thome')
+
+def custom_success(request,booking_id):
+    book = get_object_or_404(CustomBooking, pk=booking_id)
+    travel_package = book.package
+    total_amount = travel_package.price * book.passenger_limit
+    gst_rate = Decimal('0.15')  # 15% GST rate
+    gst_amount = total_amount * gst_rate
+
+        # Calculate final price including GST
+    final_price = total_amount + gst_amount
+    book_amount = int(final_price* 1)  # Example amount
+
+    client = razorpay.Client(auth=("rzp_test_PvsGkN41iQ2AJL", "6RXQIZzmrKaWRPW2tUuBbiP6"))
+    data = {
+            "amount": book_amount,
+            "currency": "INR",
+            "receipt": f"order_rcptid_{booking_id}"  # Use order ID to generate a unique receipt ID
+        }
+    payment = client.order.create(data=data)
+    new_payment = CustomPayment(
             booking=book,
             razor_pay_order_id=payment['id'],
             amount=book_amount,
@@ -1624,6 +1707,20 @@ def download_receipt(request, booking_id):
 
     return response
 
+def download_custom_receipt(request, booking_id):
+    # Retrieve booking and payment details
+    booking = get_object_or_404(CustomBooking, pk=booking_id)
+    payment = CustomPayment.objects.filter(booking=booking).first()
+
+    # Generate the PDF receipt
+    pdf_content = generate_custom_pdf_receipt(booking, payment)
+
+    # Set the appropriate Content-Type header for PDF
+    response = HttpResponse(pdf_content, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename=Receipt_{booking_id}.pdf'
+
+    return response
+
 from xhtml2pdf import pisa
 from django.template.loader import get_template
 
@@ -1655,6 +1752,33 @@ def generate_pdf_receipt(booking, payment):
     return buffer.getvalue()
 
 # views.py
+
+def generate_custom_pdf_receipt(booking, payment):
+    # Get user, passenger, and package details
+    user_details = booking.user.traveller  # Assuming the user is a traveller
+    passengers = CustomPassenger.objects.filter(package=booking.package,booking=booking, user=booking.user)
+    package_details = booking.package  # Assuming the package details are needed
+
+    # Prepare context
+    context = {
+        'booking': booking,
+        'payment': payment,
+        'user_details': user_details,
+        'passengers': passengers,
+        'package_details': package_details,
+    }
+
+    # Get HTML content from template
+    template_path = 'custom_pdf_receipt_template.html'
+    html_content = get_template(template_path).render(context)
+
+    # Create PDF
+    buffer = BytesIO()
+    pisa.CreatePDF(html_content, dest=buffer)
+
+    # Return the PDF content
+    buffer.seek(0)
+    return buffer.getvalue()
 
 
 from django.shortcuts import render, redirect
@@ -1999,17 +2123,19 @@ def get_place_suggestions(request):
 def update_custom_booking_status(request, user_id, booking_id):
     if request.method == 'POST':
         status = request.POST.get('status')
-        package = CustomPackage.objects.get(booking=booking_id)
+        # Get the CustomBooking instance
+        
+        booking = get_object_or_404(CustomBooking, id=booking_id)
 
         if status == 'Pending':
-            subject = f'Booking Status Update for Booking ID {package.name}'
+            subject = f'Booking Status Update for Booking ID {booking.package.name}'
             message = f'Your booking status has been updated to: Pending'
         elif status == 'Confirmed':
-            subject = f'Booking Status Update for Booking ID {package.name}'
+            subject = f'Booking Status Update for Booking ID {booking.package.name}'
             login_url = request.build_absolute_uri(reverse('upcoming_journeys'))  # Adjust the URL name if needed
             message = f"Your booking status has been Confirmed. Now you can Login to NIWI TRAVELS and make the payment. Click here to '{login_url}'"
         elif status == 'Cancelled':
-            subject = f'Booking Status Update for Booking ID {package.name}'
+            subject = f'Booking Status Update for Booking ID {booking.package.name}'
             login_url = request.build_absolute_uri(reverse('log'))  # Adjust the URL name if needed
             message = f"Your booking status has been Cancelled due to the incorrect entry of information of the Passengers. Login to NIWI TRAVELS and reenter the data again. We are happy to help you. Click here to login '{login_url}'"
         else:
@@ -2017,23 +2143,19 @@ def update_custom_booking_status(request, user_id, booking_id):
             return render(request, 'invalid_status.html')  # Create this template
 
         # Use get() instead of filter() to get a single Booking instance
-        booking = CustomBooking.objects.filter(user_id=user_id, pk=booking_id).first()
+        # booking = CustomBooking.objects.filter(user_id=user_id, pk=booking_id).first()
 
-        if booking:
-            # Update the booking status
-            booking.status = status
-            booking.save()
-
+        # Update the status
+        booking.status = status
+        booking.save()
             # Send an email notification
-            from_email = 'godwinbmenachery2024a@mca.ajce.in'  # Replace with your email
-            recipient_list = [booking.user.email]  # Use the email of the booking user
+        from_email = 'godwinbmenachery2024a@mca.ajce.in'  # Replace with your email
+        recipient_list = [booking.user.email]  # Use the email of the booking user
 
-            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False)
 
-            return redirect(upcoming_bookings)
-        else:
-            # Handle the case where there is no matching booking
-            return render(request, 'booking_not_found.html')  # Create this template
+        return redirect(upcoming_bookings)
+       
         
 
 @never_cache
