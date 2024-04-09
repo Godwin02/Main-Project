@@ -245,8 +245,9 @@ input[type="submit"] {
                             <img src="{{ package.package_image.url }}" alt="Package Image" style="max-height: 200px; max-width: 200px;">
                         </div>
                     {% endif %}
-                    <label for="id_new_package_image">Change Package Image:</label>
-                    <input type="file" name="new_package_image" id="id_new_package_image" accept="image/*">
+                    <label for="id_package_image">Change Package Image:</label>
+                    <input type="file" name="package_image" id="id_package_image" accept="image/*" onchange="validateImages()">
+                    <p id="package_image-validation-message" class="text-danger"></p> <!-- Validation message for package image -->
                 </div>
                 <div class="form-group">
                     <label for="id_status">Status:</label>
@@ -286,7 +287,7 @@ input[type="submit"] {
             
             
     
-            <input type="submit" value="Update Package">
+            <input type="submit" value="Update Package" onclick="return validateSheet()">
         </form>
     </div>
     
@@ -302,7 +303,8 @@ input[type="submit"] {
                     <div class="formset-form">
                         <div class="form-group">
                             <label for="day_image_${i}">Day ${i} Image:</label>
-                            <input type="file" name="day_image_${i}" id="day_image_${i}" accept="image/*">
+                            <input type="file" name="day_image_${i}" id="day_image_${i}" accept="image/*" onchange="validateImage(this)">
+                            <p id="day_image_${i}-validation-message" class="text-danger"></p> <!-- Validation message for day image -->
                         </div>
                         <div class="form-group">
                             <label for="day_image_description_${i}">Day ${i} Image Description:</label>
@@ -316,7 +318,239 @@ input[type="submit"] {
     
         $('#id_days').on('change', generateDynamicFields);
         generateDynamicFields();
-    </script>
     
+        function validateImage(input) {
+            const file = input.files[0];
+            const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
+            const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
+            const maxFileSizeInMB = maxSizeInBytes / (1024 * 1024);
+    
+            // Get the ID of the file input element
+            const inputId = input.id;
+    
+            // Get the validation message element corresponding to the file input
+            const validationMessageElement = document.getElementById(`${inputId}-validation-message`);
+    
+            // Check if the selected file is valid
+            if (!file) {
+                validationMessageElement.textContent = 'Please select an image.';
+            } else if (!allowedTypes.includes(file.type)) {
+                validationMessageElement.textContent = 'Only PNG, JPEG, JPG, and SVG images are allowed.';
+            } else if (file.size > maxSizeInBytes) {
+                validationMessageElement.textContent = `File size exceeds the maximum allowed size of ${maxFileSizeInMB}MB.`;
+            } else {
+                // Reset the validation message if the file is valid
+                validationMessageElement.textContent = '';
+            }
+        }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get form elements
+            var form = document.querySelector('form');
+            var nameInput = document.getElementById('id_name');
+            var descriptionTextarea = document.getElementById('id_description');
+            var daysInput = document.getElementById('id_days');
+            var nightsInput = document.getElementById('id_nights');
+            var priceInput = document.getElementById('id_price');
+            var categorySelect = document.getElementById('id_category');
+            var statusSelect = document.getElementById('id_status');
+
+            form.addEventListener('submit', function (event) {
+                if (!validateForm()) {
+                    event.preventDefault();
+                    // Optionally, display a message or highlight fields with errors
+                }
+            });
+    
+            nameInput.addEventListener('input', validateName);
+            descriptionTextarea.addEventListener('input', validateDescription);
+            daysInput.addEventListener('input', validateDays);
+            nightsInput.addEventListener('input', validateNights);
+            priceInput.addEventListener('input', validatePrice);
+            categorySelect.addEventListener('change', validateCategory);
+            statusSelect.addEventListener('change', validateStatus);
+
+            function validateForm() {
+                var isValid = true;
+    
+                // Example: Validate name
+                isValid = isValid && validateName();
+    
+                // Example: Validate description
+                isValid = isValid && validateDescription();
+    
+                // Example: Validate days
+                isValid = isValid && validateDays();
+    
+                // Example: Validate nights
+                isValid = isValid && validateNights();
+    
+                // Example: Validate price
+                isValid = isValid && validatePrice();
+    
+                // Example: Validate category
+                isValid = isValid && validateCategory();
+                
+                isValid = isValid && validateStatus();
+
+                return isValid;
+            }
+    
+            function validateName() {
+                var nameValue = nameInput.value.trim();
+                if (nameValue === '') {
+                    showAlert(nameInput, 'Name cannot be empty');
+                    return false;
+                } else {
+                    hideAlert(nameInput);
+                    return true;
+                }
+            }
+    
+            function validateDescription() {
+                var descriptionValue = descriptionTextarea.value.trim();
+                if (descriptionValue === '') {
+                    showAlert(descriptionTextarea, 'Description cannot be empty');
+                    return false;
+                } else {
+                    hideAlert(descriptionTextarea);
+                    return true;
+                }
+            }
+    
+            function validateDays() {
+                var daysValue = parseInt(daysInput.value, 10);
+                if (isNaN(daysValue) || daysValue < 1) {
+                    showAlert(daysInput, 'Days must be a positive integer');
+                    return false;
+                } else {
+                    hideAlert(daysInput);
+                    return true;
+                }
+            }
+    
+            function validateNights() {
+                var nightsValue = parseInt(nightsInput.value, 10);
+                if (isNaN(nightsValue) || nightsValue < 1) {
+                    showAlert(nightsInput, 'Nights must be a positive integer');
+                    return false;
+                } else {
+                    hideAlert(nightsInput);
+                    return true;
+                }
+            }
+    
+            function validatePrice() {
+                var priceValue = parseFloat(priceInput.value);
+                if (isNaN(priceValue) || priceValue <= 0) {
+                    showAlert(priceInput, 'Price must be a positive number');
+                    return false;
+                } else {
+                    hideAlert(priceInput);
+                    return true;
+                }
+            }
+    
+            function validateCategory() {
+                var selectedCategory = categorySelect.options[categorySelect.selectedIndex].value;
+                if (selectedCategory === '') {
+                    showAlert(categorySelect, 'Please select a category');
+                    return false;
+                } else {
+                    hideAlert(categorySelect);
+                    return true;
+                }
+            }
+            function validateStatus() {
+                    var selectedStatus = statusSelect.options[statusSelect.selectedIndex].value;
+                    var alertElement = document.getElementById('id_status-alert');
+
+                    if (selectedStatus === '') {
+                        alertElement.textContent = 'Please select a status';
+                        statusSelect.classList.add('is-invalid');
+                        return false;
+                    } else {
+                        alertElement.textContent = '';
+                        statusSelect.classList.remove('is-invalid');
+                        return true;
+                    }
+                }
+                
+            function showAlert(inputElement, message) {
+                var alertId = inputElement.id + '-alert';
+                var alertElement = document.getElementById(alertId);
+    
+                if (!alertElement) {
+                    alertElement = document.createElement('div');
+                    alertElement.id = alertId;
+                    alertElement.classList.add('alert', 'alert-danger');
+                    inputElement.parentNode.appendChild(alertElement);
+                }
+    
+                alertElement.textContent = message;
+            }
+    
+            function hideAlert(inputElement) {
+                var alertId = inputElement.id + '-alert';
+                var alertElement = document.getElementById(alertId);
+    
+                if (alertElement) {
+                    alertElement.parentNode.removeChild(alertElement);
+                }
+            }
+        });
+    </script>    
+    
+    <script>
+        function validateImages() {
+        const files = document.getElementById('id_package_image').files;
+        const imageValidationMessage = document.getElementById('package_image-validation-message');
+
+        if (files.length === 0) {
+        // No file selected
+        imageValidationMessage.textContent = 'Please select an image.';
+        return;
+        }
+
+        const file = files[0];
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
+
+        if (!allowedTypes.includes(file.type)) {
+        // Invalid file type
+        imageValidationMessage.textContent = 'Only PNG, JPEG, JPG, and SVG images are allowed.';
+        return;
+        }
+
+        const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
+        if (file.size > maxSizeInBytes) {
+        // File size exceeds the maximum allowed size
+        imageValidationMessage.textContent = 'File size exceeds the maximum allowed size of 5MB.';
+        return;
+        }
+
+        // If the file meets all criteria, clear the validation message
+        imageValidationMessage.textContent = '';
+        }
+
+        </script>
+        <script>
+        function validateSheet() {
+        // Check if any validation messages exist
+        const validationMessages = document.querySelectorAll('.text-danger');
+        let isValid = true;
+
+        // Iterate over each validation message
+        validationMessages.forEach(message => {
+        if (message.textContent.trim() !== '') {
+            // If any validation message is not empty, the form is invalid
+            isValid = false;
+        }
+        });
+
+        return isValid;
+        }
+
+    </script>
     </body>
     </html>

@@ -1,4 +1,7 @@
+import calendar
+from collections import Counter, defaultdict
 from dataclasses import fields
+import io
 from itertools import count
 from django.forms import DateField, DurationField, ValidationError
 from django.shortcuts import render, redirect
@@ -136,29 +139,42 @@ def login(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
+        recaptcha_response = request.POST.get('g-recaptcha-response')
 
-        user = authenticate(username=username, password=password)
+        # Verify the reCAPTCHA response
+        data = {
+            'secret': '6LfCTLApAAAAAEWzkbTQXBlzkZ-QPlYDQGf6V_bC',
+            'response': recaptcha_response
+        }
+        response = requests.post('https://www.google.com/recaptcha/api/siteverify', data=data)
+        result = response.json()
 
-        if user is not None:
-            auth_login(request, user)
-            
-            if user.is_traveller==True:
-                request.session["user_type"] = "traveller" 
-                print("hello") # Set session variable for user type
-                messages.success(request, "welcome To NIWI TRAVELS. Explore the Unexplored!")
-                return redirect('/thome')
-            elif user.is_driver==True:
-                request.session["user_type"] = "driver"  # Set session variable for user type
-                return redirect('/dhome')
-            elif user.is_staff:
-                request.session["user_type"] = "admin"  # Set session variable for user type
-                return redirect('/admins')
+        if result['success']:
+            # reCAPTCHA verification successful
+            user = authenticate(username=username, password=password)
+
+            if user is not None:
+                auth_login(request, user)
+                
+                if user.is_traveller:
+                    request.session["user_type"] = "traveller"
+                    messages.success(request, "Welcome to NIWI TRAVELS. Explore the Unexplored!")
+                    return redirect('/thome')
+                elif user.is_driver:
+                    request.session["user_type"] = "driver"
+                    return redirect('/dhome')
+                elif user.is_staff:
+                    request.session["user_type"] = "admin"
+                    return redirect('/admins')
+            else:
+                messages.error(request, "Username or Password is incorrect.")
         else:
-            messages.error(request, "Username or Password is Incorrect.")
+            messages.error(request, "reCAPTCHA verification failed.")
     
     cache.clear()
     return render(request, 'login.html')
-
+# site key:6LfCTLApAAAAAN6cpZGAid6gSxT4O5eYj4GXQZlq
+# secret key: 6LfCTLApAAAAAEWzkbTQXBlzkZ-QPlYDQGf6V_bC
 @csrf_protect
 @sensitive_post_parameters()
 @never_cache
@@ -421,11 +437,99 @@ def logo(request):
     return redirect('/')
 
 
+from django.db.models.functions import TruncMonth
 @never_cache
 @login_required(login_url='log')
 def admin(request):
     if request.user.is_staff:
-        return render(request, 'adminreg.html')
+        start_date = timezone.now()   # Example: 30 days ago
+        end_date = timezone.now() + timedelta(days=365) # Current date
+
+        # Get all bookings within the specified duration
+        bookings_within_duration = CustomBooking.objects.filter(status='Confirmed', start_date__range=[start_date, end_date])
+
+        # Count the number of bookings for each package within the duration
+        booking_count_by_package = Counter(bookings_within_duration.values_list('package__name', flat=True))
+
+        # Get the most booked package
+        if booking_count_by_package:  # Check if the counter is not empty
+            # Get the most booked package
+            most_booked_package = booking_count_by_package.most_common(1)[0][0]
+            most_booked_package_count = booking_count_by_package[most_booked_package]
+        else:
+            most_booked_package = None
+            most_booked_package_count = 0
+
+        # Get the number of bookings for the most booked package within the specified duration
+        bookings_for_most_booked_package = CustomBooking.objects.filter(status='Confirmed', package__name=most_booked_package,
+                                                                        start_date__range=[start_date, end_date]).count()
+        today = timezone.now()
+        past_month_start = today - timedelta(days=30)
+        past_month_end = today
+        upcoming_month_start = today + timedelta(days=1)
+        upcoming_month_end = today + timedelta(days=60)  # Adjust as needed
+
+        # Get all confirmed bookings within the past month
+        past_month_bookings = CustomBooking.objects.filter(status='Confirmed', start_date__range=[past_month_start, past_month_end])
+        current_month_start = today.replace(day=1)
+        current_month_end = today.replace(day=1, month=today.month+1) - timedelta(days=1)
+        # Get all confirmed bookings within the upcoming months
+        upcoming_month_bookings = CustomBooking.objects.filter(status='Confirmed', start_date__range=[upcoming_month_start, upcoming_month_end])
+        current_month_bookings = CustomBooking.objects.filter(status='Confirmed', start_date__range=[current_month_start, current_month_end])
+
+        # Count the number of confirmed bookings for each period
+        total_confirmed_current_month = current_month_bookings.count()
+        # Count the number of confirmed bookings for each period
+        total_confirmed_past_month = past_month_bookings.count()
+        total_confirmed_upcoming_months = upcoming_month_bookings.count()
+
+
+        end_date = timezone.now()
+        start_date = end_date - timedelta(days=365)
+
+        # Get all packages
+        packages = CustomPackage.objects.all()
+
+        # Get all months of the year
+        months = [calendar.month_name[i] for i in range(1, 13)]
+
+        # Initialize a list to store dictionaries for each package's booking counts
+        booking_counts = defaultdict(lambda: defaultdict(int))
+
+        # Loop through each package
+        for package in packages:
+            # Loop through each month in the year
+            for month_name in months:
+                # Count bookings for the current package and month
+                month_bookings = CustomBooking.objects.filter(status='Confirmed', start_date__year=end_date.year, start_date__month=months.index(month_name) + 1, package=package)
+                booking_count = month_bookings.count()
+
+                # Add the booking count to the dictionary
+                booking_counts[package.name][month_name] = booking_count
+
+        # Convert booking_counts to a list of dictionaries
+        booking_counts_list = [{'package': package, **counts} for package, counts in booking_counts.items()]
+
+
+        booking_data = CustomPayment.objects.annotate(month=TruncMonth('payment_date')).values('month').annotate(total_amount=Sum('amount'))
+
+    # Prepare the data for visualization
+        data = [(entry['month'].strftime('%B %Y'), entry['total_amount']) for entry in booking_data]
+
+        context = {
+            'most_booked_package': most_booked_package,
+            'most_booked_package_count': most_booked_package_count,
+            'bookings_for_most_booked_package': bookings_for_most_booked_package,
+            'total_confirmed_past_month':total_confirmed_past_month,
+            'total_confirmed_current_month':total_confirmed_current_month,
+            'total_confirmed_upcoming_months':total_confirmed_upcoming_months,
+            'packages': packages,
+            'months': months,
+            'booking_counts_list': booking_counts_list,
+            'booking_data': data,
+        }
+
+        return render(request, 'adminreg.html', context)
     cache.clear()
     return redirect('/log')
 
@@ -660,7 +764,11 @@ def view_travel_packages(request):
     # Query the database to get a list of TravelPackage instances
     all_packages = TravelPackage.objects.all()
     search_date = request.GET.get('search_date')
-    
+    for package in all_packages:
+        if package.end_date <= timezone.now().date():
+            package.feed = 'Save'
+            package.status = 'Running'  # Assuming 'Save' is the correct status value
+            package.save()
     running_packages = all_packages.filter(feed='Post',status='Running')
     paused_packages = all_packages.filter(Q(status='Pending') | Q(status='Running'), Q(feed='Save') | Q(feed='Post'))
 
@@ -760,6 +868,10 @@ from .models import Passenger
 @login_required(login_url='log')
 def add_passenger(request, package_id):
     package = get_object_or_404(TravelPackage, id=package_id)
+    start_date = package.start_date
+    end_date = package.end_date
+    duration=package.duration
+    price=package.price
     if request.method == 'POST':
         user_id = request.user.id
         package_id = package_id
@@ -769,14 +881,34 @@ def add_passenger(request, package_id):
         proof_of_id_list = request.FILES.getlist('proof_of_id')
         children=request.POST.get('children')
         print(passenger_name_list,passenger_limit)
+        if not passenger_name_list or not passenger_age_list or not proof_of_id_list:
+            messages.error(request, 'Please fill out all required fields.')
+            return redirect('add_passenger', package_id=package_id)
+
             
             # Check if the number of entries in all lists match
         if len(passenger_name_list) == len(passenger_age_list) == len(proof_of_id_list):
             total_passengers = len(passenger_name_list)
 
-            flag = 0
+            # Create and save CustomBooking instance outside the loop
+            
             if total_passengers <= package.availability:
 
+                booking = Booking(
+                    package_id=package_id,
+                    user_id=user_id,
+                    status='Confirmed' , # Set the status to 'Confirmed' or 'Pending' as needed
+                    passenger_limit=passenger_limit,
+                    children=children,
+                    start_date=start_date,
+                    end_date=end_date,
+                    price=price,
+                    duration=duration,
+                    )
+                booking.save()
+                package.availability -= total_passengers
+                package.save()
+                # Loop through passengers and associate them with the created booking
                 for i in range(total_passengers):
                     passenger_name = passenger_name_list[i]
                     passenger_age = passenger_age_list[i]
@@ -787,35 +919,74 @@ def add_passenger(request, package_id):
                         package_id=package_id,
                         passenger_name=passenger_name,
                         passenger_age=passenger_age,
-                        proof_of_id=proof_of_id
+                        proof_of_id=proof_of_id,
+                        booking=booking,
                     )
                     passenger.save()
-                    flag = 1
 
-                if flag == 0:
-                    return render(request, 'passenger_info.html', {'package':package,'package_id': package_id})
-                else:
-                                    # Update availability
-                    package.availability -= total_passengers
-                    package.save()
-                    booking = Booking(
-                    package_id=package_id,
-                    user_id=user_id,
-                    status='Pending' , # Set the status to 'Confirmed' or 'Pending' as needed
-                    passenger_limit=passenger_limit,
-                    children=children
-                    )
-                    booking.save()
-                    messages.success(request, "Your Booking Procedures have been Initialized. Stay Connected for getting further Updates.")
+                messages.success(request, "Your Booking Procedures have been Initialized. Stay Connected for getting further Updates.") 
+                return redirect('payment',booking_id=booking.id)
 
-                    return redirect('/thome')
             else:
-                messages.error(request, "Not enough availability for the selected package.")
-
-        else:
             # Handle the case where the number of entries in lists don't match
+                messages.error(request, "Not enough availability for the selected package.")
+        else:
             messages.success(request, "Upload ID Proof of Number of Passengers Entered for Booking.")
-    return render(request, 'passenger_info.html', {'package':package,'package_id': package_id})
+    else:
+
+        return render(request, 'passenger_info.html', {'package':package,'package_id': package_id})
+
+    #     if len(passenger_name_list) == len(passenger_age_list) == len(proof_of_id_list):
+    #         total_passengers = len(passenger_name_list)
+
+    #         flag = 0
+    #         if total_passengers <= package.availability:
+    #             booking = Booking(
+    #                 package_id=package_id,
+    #                 user_id=user_id,
+    #                 status='Pending' , # Set the status to 'Confirmed' or 'Pending' as needed
+    #                 passenger_limit=passenger_limit,
+    #                 children=children,
+    #                 start_date=start_date,
+    #                 end_date=end_date,
+    #                 price=price,
+    #                 duration=duration,
+    #                 )
+    #             booking.save()
+
+    #             for i in range(total_passengers):
+    #                 passenger_name = passenger_name_list[i]
+    #                 passenger_age = passenger_age_list[i]
+    #                 proof_of_id = proof_of_id_list[i]
+
+    #                 passenger = Passenger(
+    #                     user_id=user_id,
+    #                     package_id=package_id,
+    #                     passenger_name=passenger_name,
+    #                     passenger_age=passenger_age,
+    #                     proof_of_id=proof_of_id,
+    #                     booking=booking,
+    #                 )
+    #                 passenger.save()
+    #                 flag = 1
+
+    #             if flag == 0:
+    #                 return render(request, 'passenger_info.html', {'package':package,'package_id': package_id})
+    #             else:
+    #                                 # Update availability
+    #                 package.availability -= total_passengers
+    #                 package.save()
+                    
+    #                 messages.success(request, "Your Booking Procedures have been Initialized. Stay Connected for getting further Updates.")
+
+    #                 return redirect('/thome')
+    #         else:
+    #             messages.error(request, "Not enough availability for the selected package.")
+
+    #     else:
+    #         # Handle the case where the number of entries in lists don't match
+    #         messages.success(request, "Upload ID Proof of Number of Passengers Entered for Booking.")
+    # return render(request, 'passenger_info.html', {'package':package,'package_id': package_id})
       
 
 from django.shortcuts import render
@@ -828,53 +999,58 @@ from django.db.models import Q
 def upcoming_journeys(request):
     current_date = timezone.now().date()
     user = request.user
+    two_days_before_start_date = current_date + timedelta(days=2) 
+    print("LOOOO",two_days_before_start_date)
+    # upcoming_journeys = TravelPackage.objects.filter(start_date__gt=current_date, passenger__user=user).distinct()
+    # # Create a list to store confirmed bookings
+    # confirmed_bookings = Booking.objects.filter(user=user)
 
-    
-    # Retrieve upcoming journeys for the user
-    upcoming_journeys = TravelPackage.objects.filter(start_date__gt=current_date, passenger__user=user).distinct()
-    # Create a list to store confirmed bookings
-    confirmed_bookings = Booking.objects.filter(user=user)
+    # # Create a list to store the package data with images and booking status
+    # packages_with_image = []
 
-    # Create a list to store the package data with images and booking status
-    packages_with_images = []
+    # for journey in upcoming_journeys:
+    #     # Retrieve images related to the travel package
+    #     package_images = PackageImage.objects.filter(package=journey)
+    #     passengers = Passenger.objects.filter(user=user, package=journey)
 
-    for journey in upcoming_journeys:
-        # Retrieve images related to the travel package
-        package_images = PackageImage.objects.filter(package=journey)
-        passengers = Passenger.objects.filter(user=user, package=journey)
+    #     # Check if there is a confirmed booking for the current user
+    #     booking = confirmed_bookings.filter(package=journey).first()
 
-        # Check if there is a confirmed booking for the current user
-        booking = confirmed_bookings.filter(package=journey).first()
+    #     # Append the travel package, its images, and booking status to the list
+    #     packages_with_image.append({
+    #         'package': journey,
+    #         'images': package_images,
+    #         'booking': booking,
+    #         'passengers':passengers,
+    #     })
 
-        # Append the travel package, its images, and booking status to the list
-        packages_with_images.append({
-            'package': journey,
-            'images': package_images,
-            'booking': booking,
-            'passengers':passengers,
-        })
-
-
+    packages_with_images = Booking.objects.filter(user=user, status__in=['Confirmed', 'Pending'], start_date__gt=timezone.now())
+    package_ids = packages_with_images.values_list('package_id', flat=True)
+    package_images = []
+    for booking in packages_with_images:
+        first_image = PackageImage.objects.filter(package=booking.package).first()
+        if first_image:
+            package_images.append(first_image)
+        if booking.passenger_limit == 0:
+            return redirect('cancel_booking',booking_id=booking.id)
 
     upcoming_custom_journeys = CustomBooking.objects.filter(
         user=user,
         status__in=['Confirmed', 'Pending'],  # Use status__in to filter by multiple statuses
         start_date__gt=current_date
     ).order_by('start_date')
-
     for booking in upcoming_custom_journeys:
         if booking.passenger_limit <= 0:
             booking.status='Cancelled'
             booking.save()
-
-    return render(request, 'upcoming_journeys.html',  {'packages_with_images': packages_with_images,'upcoming_custom_journeys':upcoming_custom_journeys})
+    return render(request, 'upcoming_journeys.html',  {'packages_with_images': packages_with_images,'upcoming_custom_journeys':upcoming_custom_journeys,'package_images':package_images,'payment':payment,'two_days_before_start_date':two_days_before_start_date})
 @never_cache
 @login_required(login_url='log')
 def delete_passenger(request, passenger_id):
     passenger = get_object_or_404(Passenger, id=passenger_id)
 
     # Get the related booking
-    booking = Booking.objects.get(package=passenger.package, user=request.user)
+    booking = Booking.objects.get(pk=passenger.booking.id, user=request.user)
 
     # Delete the passenger
     passenger.delete()
@@ -886,19 +1062,20 @@ def delete_passenger(request, passenger_id):
     # Update availability in the TravelPackage model
     passenger.package.availability += 1
     passenger.package.save()
-
+    if booking.passenger_limit == 0:
+        return redirect('cancel_booking',booking_id=passenger.booking.id)
     # Redirect to the passenger details page or any other appropriate page
     # You can change 'passenger_details' to the actual URL pattern name for your passenger details view
-    return redirect('passenger_details', package_id=passenger.package.id)
+    return redirect('passenger_details', booking_id=passenger.booking.id)
 
 @never_cache
 @login_required(login_url='log')
-def passenger_details(request, package_id):
+def passenger_details(request, booking_id):
     user=request.user
-    package = get_object_or_404(TravelPackage, id=package_id)
-    passengers = Passenger.objects.filter(package=package,user=user)
+    booking = get_object_or_404(Booking, id=booking_id)
+    passengers = Passenger.objects.filter(booking=booking_id,user=user)
     
-    return render(request, 'passenger_details.html', {'package': package, 'passengers': passengers})
+    return render(request, 'passenger_details.html', {'booking': booking, 'passengers': passengers})
 
 
 @never_cache
@@ -907,45 +1084,98 @@ def history_journeys(request):
     current_date = timezone.now().date()
     user = request.user  # Assuming you are using authentication
 
-    # Retrieve historical journeys for the user
-    history_journeys = TravelPackage.objects.filter(end_date__lt=current_date, passenger__user=user).distinct()
+#     # Retrieve historical journeys for the user
+#     history_journeys = TravelPackage.objects.filter(end_date__lt=current_date, passenger__user=user).distinct()
+#     packages_with_images = []
+
+#     for journey in history_journeys:
+#         # Retrieve images related to the travel package
+#         booking = Booking.objects.filter(
+#                 user=user,
+#                 package=journey,
+#             ).first()
+
+#             # Retrieve images related to the travel package
+#         package_images = PackageImage.objects.filter(package=journey)
+#         rating = Rating.objects.filter(user=user, package=journey).first()
+
+#             # Append the travel package, its images, and booking status to the list
+#         packages_with_images.append({
+#                 'package': journey,
+#                 'images': package_images,
+#                 'booking': booking, 
+#                 'rating': rating,
+#  # Include booking status in the dictionary
+#             })
+    all_accounts = Accounts.objects.all()
+
+    # Initialize an empty list to store bookings
+    all_bookings = []
+
+    # Iterate over each account and fetch the associated booking
+    for account in all_accounts:
+        if account.booking:
+            all_bookings.append(account.booking.id)
+    print("LOOOOOOO",all_bookings)
+    packages_with_image = Booking.objects.filter(user=user, end_date__lt=timezone.now()).order_by('-updated_at')
+    cancelled_booking = Booking.objects.filter(user=user, status='Cancelled').order_by('-updated_at')
+    cancelled_bookings = []
+    for booking in cancelled_booking:
+        first_image = PackageImage.objects.filter(package=booking.package).first()
+        package = booking.package
+        cancelled_bookings.append({ 'images':first_image, 'package':package, 'booking':booking })
+        print("JOURNEY",booking)
+
+    print("Length",len(packages_with_image))
+    package_ids = packages_with_image.values_list('package_id', flat=True)
     packages_with_images = []
-
-    for journey in history_journeys:
-        # Retrieve images related to the travel package
-        booking = Booking.objects.filter(
-                user=user,
-                package=journey,
-                status='Confirmed'
-            ).first()
-
-            # Retrieve images related to the travel package
-        package_images = PackageImage.objects.filter(package=journey)
-        rating = Rating.objects.filter(user=user, package=journey).first()
-
-            # Append the travel package, its images, and booking status to the list
-        packages_with_images.append({
-                'package': journey,
-                'images': package_images,
-                'booking': booking, 
-                'rating': rating,
- # Include booking status in the dictionary
-            })
+    for booking in packages_with_image:
+        first_image = PackageImage.objects.filter(package=booking.package).first()
+        rating = Rating.objects.filter(user=user, booking=booking).first()
+        package = booking.package
+        
+        packages_with_images.append({ 'images':first_image, 'rating':rating, 'package':package, 'booking':booking })
+        print("journey",booking)
     history_custom_journeys = CustomBooking.objects.filter(
         user=user,
-        start_date__lt=current_date
-    ).order_by('start_date')
-    c_rating = []
-
+        start_date__lt=current_date,
+        status__in=['Confirmed', 'Pending'],
+    ).order_by('-updated_at')
+    cancelled_custom_booking = CustomBooking.objects.filter(user=user, status='Cancelled').order_by('-updated_at')
+    cancelled_custom_bookings = []
+    for booking in cancelled_custom_booking:
+        # first_image = Day.objects.filter(package=booking.package).first()
+        package = booking.package
+        cancelled_custom_bookings.append({ 'package':package, 'booking':booking })
+        print("JOURNEY",booking)
+    # c_rating = []
 # Iterate over each booking
-    for journey in history_custom_journeys:
+    # for journey in history_custom_journeys:
         # Fetch all ratings for the current booking
-        ratings = CustomRating.objects.filter(user=user, booking=journey)
-        # Add the ratings to the list
-        c_rating.append(ratings)
-    print("here",c_rating)
+       
+        # Fetch the rating for the current booking
+    ratings = CustomRating.objects.all()       # Append the rating to the list
+    c_rating_booking_ids = CustomRating.objects.values_list('booking_id', flat=True)
 
-    return render(request, 'history_journeys.html', {'packages_with_images': packages_with_images,'history_custom_journeys':history_custom_journeys,'c_rating':c_rating})
+        # c_rating.append(rating)
+        # Handle the case where no rating is found for the current booking
+        # You can choose to append None or any other placeholder value to c_rating
+        # c_rating.append(None)
+    print("here",ratings)
+    print("hey",history_custom_journeys)
+    print("blaah",c_rating_booking_ids)
+    all_account = Refund.objects.all()
+
+    # Initialize an empty list to store bookings
+    all_booking = []
+
+    # Iterate over each account and fetch the associated booking
+    for account in all_account:
+        if account.booking:
+            all_booking.append(account.booking.id)
+    print("LOOOOOOO",all_booking)
+
+    return render(request, 'history_journeys.html', {'packages_with_images': packages_with_images,'history_custom_journeys':history_custom_journeys,'c_rating':ratings,'c_rating_booking_ids': c_rating_booking_ids,'cancelled_bookings':cancelled_bookings,'cancelled_custom_bookings':cancelled_custom_bookings,'all_bookings':all_bookings,'all_booking':all_booking})
 
 
 from django.db.models import F, ExpressionWrapper
@@ -958,78 +1188,95 @@ def ongoing_journeys(request):
     user = request.user  # Assuming you are using authentication
 
     # Retrieve historical journeys for the user
-    ongoing_journeys = TravelPackage.objects.filter(start_date__lte=current_date ,end_date__gt=current_date, passenger__user=user).distinct()
+    # ongoing_journeys = Booking.objects.filter(start_date__lte=current_date ,end_date__gt=current_date, passenger__user=user).distinct()
 
-    packages_with_images = []
+    # packages_with_images = []
 
-    for journey in ongoing_journeys:
-        # Check if the package is booked and confirmed by the user
-        booking = Booking.objects.filter(
-            user=user,
-            package=journey,
-            status='Confirmed'
-        ).first()
+    # for journey in ongoing_journeys:
+    #     # Check if the package is booked and confirmed by the user
+    #     booking = Booking.objects.filter(
+    #         user=user,
+    #         package=journey,
+    #         status='Confirmed'
+    #     ).first()
 
-        # Retrieve images related to the travel package
-        package_images = PackageImage.objects.filter(package=booking.package)
+    #     # Retrieve images related to the travel package
+    #     package_images = PackageImage.objects.filter(package=booking.package)
 
-        # Append the travel package, its images, and booking status to the list
-        packages_with_images.append({
-            'package': booking.package,
-            'images': package_images,
-            'booking': booking,  # Include booking status in the dictionary
-        })
+    #     # Append the travel package, its images, and booking status to the list
+    #     packages_with_images.append({
+    #         'package': booking.package,
+    #         'images': package_images,
+    #         'booking': booking,  # Include booking status in the dictionary
+    #     })
 
 
-    end_date_expression = F('start_date') + ExpressionWrapper(F('package__days'), output_field=DateField())
+
+    packages_with_images = Booking.objects.filter(start_date__lte=current_date ,end_date__gt=current_date, user=user, payment='Paid')
+    package_ids = packages_with_images.values_list('package_id', flat=True)
+    package_images = []
+    for booking in packages_with_images:
+        first_image = PackageImage.objects.filter(package=booking.package).first()
+        if first_image:
+            package_images.append(first_image)
 
 # Filter the ongoing custom journeys
+    end_date_expression = F('start_date') + ExpressionWrapper(F('package__days'), output_field=DateField())
+
     ongoing_custom_journeys = CustomBooking.objects.filter(
     user=user,
     status='Confirmed',
     start_date__gte=current_date,
-    start_date__lte=end_date_expression
+    start_date__lte=end_date_expression,
+    payment='Paid',
     ).order_by('start_date')
     print(current_date, F('start_date') + ExpressionWrapper(F('package__days'), output_field=DurationField()))
-    return render(request, 'ongoing_journeys.html', {'packages_with_images': packages_with_images,'ongoing_custom_journeys':ongoing_custom_journeys})
+    return render(request, 'ongoing_journeys.html', {'packages_with_images': packages_with_images,'ongoing_custom_journeys':ongoing_custom_journeys,'package_images':package_images})
 
 
 from django.db import transaction
 from django.urls import reverse
 @never_cache
 @login_required(login_url='log')
-def cancel_booking(request, package_id):
+def cancel_booking(request, booking_id):
     # Retrieve the travel package and all passengers associated with the package and the logged-in user
-    package = get_object_or_404(TravelPackage, pk=package_id)
-    passengers = Passenger.objects.filter(package=package_id, user=request.user)
+    # package = get_object_or_404(TravelPackage, pk=booking_id.package)
+    passengers = Passenger.objects.filter(booking=booking_id, user=request.user)
 
     # Check if there are passengers to cancel
-    if passengers:
-        try:
+    # if passengers:
+    #     try:
             # Store the length of passengers before deleting
-            num_passengers = len(passengers)
+    num_passengers = len(passengers)
 
-            # Delete all passenger records
-            passengers.delete()
+    # Delete all passenger records
+    # passengers.delete()
 
-            booking = Booking.objects.filter(user=request.user, package=package)
-            booking.delete()
+    booking = get_object_or_404(Booking, pk=booking_id)
+    booking.status='Cancelled'
+    booking.save()
+    package=booking.package
+    # Update the availability of the travel package
+    print(f"Before: {package.availability}")
+    package.availability += num_passengers
+    package.save()
+    print(f"After: {package.availability}")
 
-            # Update the availability of the travel package
-            print(f"Before: {package.availability}")
-            package.availability += num_passengers
-            package.save()
-            print(f"After: {package.availability}")
-
-            messages.success(request, "Your bookings have been canceled successfully")
-
-        except Exception as e:
-            # Handle any exceptions that might occur during the database operations
-            messages.error(request, f"An error occurred: {e}")
-
+    payment = Payment.objects.filter(booking=booking_id).first()
+    if payment and payment.is_paid==True:
+        return redirect('accounts',booking_id=booking_id)
+    
     else:
-        # Handle the case where no bookings were found
-        messages.error(request, "No bookings found for cancellation")
+
+        messages.success(request,"This custom trip has been Cancelled Succesfully.")
+
+    # except Exception as e:
+        # Handle any exceptions that might occur during the database operations
+    # messages.error(request, f"An error occurred: {e}")
+
+    # else:
+    #     # Handle the case where no bookings were found
+    #     messages.error(request, "No bookings found for cancellation")
 
     return redirect(reverse('thome'))  # Redirect to 'thome' using the named URL pattern
 
@@ -1039,8 +1286,14 @@ def cancel_custom_booking(request, booking_id):
     booking=CustomBooking.objects.filter(pk=booking_id).first()
     booking.status='Cancelled'
     booking.save()
-    return redirect('upcoming_journeys')
+    payment = CustomPayment.objects.filter(booking=booking).first()
+    if payment and payment.is_paid==True:
+        return redirect('account_details',booking_id=booking_id)
+    
+    else:
 
+        messages.success(request,"This custom trip has been Cancelled Succesfully.")
+        return redirect('thome')
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -1127,7 +1380,7 @@ def package_requests(request, package_id):
                 'package_name': booking.package.package_name,
                 'start_date': booking.package.start_date,
                 'user_email': booking.user.email,
-                'passenger_details_url': reverse('passenger_count', args=[booking.package.id]),
+                'passenger_details_url': reverse('passenger_count', args=[booking.id]),
                 'verification_status': booking.status,
                 'user_id': user_id,  # Add user id for the form action URL
             }
@@ -1156,8 +1409,13 @@ def package_requests(request, package_id):
 def booking_list(request, package_id):
     # Retrieve the package or return a 404 response if not found
     package = get_object_or_404(TravelPackage, id=package_id)
-    passengers = Passenger.objects.filter(package=package,status='Confirmed')
-    verified_passengers = Booking.objects.filter( status='Confirmed',package=package) 
+    verified_passengers = Booking.objects.filter( package=package, status='Confirmed', payment='Paid')
+    passengers=[]
+    for i in verified_passengers:
+        passenger = Passenger.objects.filter(booking_id=i,package_id=package_id,)
+        for j in passenger:
+            passengers.append(j)
+    print(passengers)
     sum_of_children = verified_passengers.aggregate(Sum('children'))['children__sum']
     print(sum_of_children)
     # Retrieve booking information for the specific package with status 'Pending'
@@ -1179,7 +1437,7 @@ def booking_list(request, package_id):
                 'package_name': booking.package.package_name,
                 'start_date': booking.package.start_date,
                 'user_email': booking.user.email,
-                'passenger_details_url': reverse('passenger_count', args=[booking.package.id]),
+                'passenger_details_url': reverse('passenger_count', args=[booking.id]),
                 'verification_status': booking.status,
                 'user_id': user_id,  # Add user id for the form action URL
             }
@@ -1210,12 +1468,12 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 @never_cache
 @login_required(login_url='log')
-def passenger_count(request, package_id):
+def passenger_count(request, booking_id):
     # Retrieve the specific travel package
-    package = get_object_or_404(TravelPackage, pk=package_id)
+    booking = get_object_or_404(Booking, pk=booking_id)
 
     # Retrieve all passengers for the selected package
-    passengers = Passenger.objects.filter(package=package)
+    passengers = Passenger.objects.filter(booking=booking)
 
 
     # Set the number of items per page
@@ -1232,7 +1490,7 @@ def passenger_count(request, package_id):
         # If the page is out of range, show the last page
         passengers = paginator.page(paginator.num_pages)
 
-    return render(request, 'passenger_counts.html', {'package': package, 'passengers': passengers})
+    return render(request, 'passenger_counts.html', {'package': booking, 'passengers': passengers})
 
 
 from django.db.models import F, ExpressionWrapper, fields, Sum
@@ -1289,7 +1547,7 @@ def ongoing_passengers(request, package_id):
                 'package_name': booking.package.package_name,
                 'start_date': booking.package.start_date,
                 'user_email': booking.user.email,
-                'passenger_details_url': reverse('passenger_count', args=[booking.package.id]),
+                'passenger_details_url': reverse('passenger_count', args=[booking.id]),
                 'verification_status': booking.status,
                 'user_id': user_id,  # Add user id for the form action URL
             }
@@ -1365,7 +1623,7 @@ def history_passengers(request, package_id):
                 'package_name': booking.package.package_name,
                 'start_date': booking.package.start_date,
                 'user_email': booking.user.email,
-                'passenger_details_url': reverse('passenger_count', args=[booking.package.id]),
+                'passenger_details_url': reverse('passenger_count', args=[booking.id]),
                 'verification_status': booking.status,
                 'user_id': user_id,  # Add user id for the form action URL
                 'stars': ratings.first().stars if ratings.exists() else 0,
@@ -1565,6 +1823,8 @@ def success(request,booking_id):
             user=request.user  # Assuming the user is authenticated and initiating the payment
         )
     new_payment.save()
+    book.payment = 'Paid'
+    book.save()
     return redirect('/thome')
 
 def custom_success(request,booking_id):
@@ -1593,6 +1853,8 @@ def custom_success(request,booking_id):
             user=request.user  # Assuming the user is authenticated and initiating the payment
         )
     new_payment.save()
+    book.payment = 'Paid'
+    book.save()
     return redirect('/thome')
 
 
@@ -1631,10 +1893,10 @@ def export_passenger_data_to_excel(request,package_id):
     return response
 
 from django.http import JsonResponse
-def submit_rating(request, package_id, stars):
+def submit_rating(request, booking_id, stars):
     if request.method == 'POST':
         user = request.user
-        package = TravelPackage.objects.get(pk=package_id)
+        booking = Booking.objects.get(pk=booking_id)
 
         # Check if the form data is valid
 
@@ -1647,12 +1909,12 @@ def submit_rating(request, package_id, stars):
 
         # Check if the user has already rated the package
         try:
-            rating = Rating.objects.get(user=user, package=package)
+            rating = Rating.objects.get(user=user, booking=booking)
             rating.stars = rating_value
             rating.description = request.POST.get('description', '')
             rating.save()
         except Rating.DoesNotExist:
-            rating = Rating.objects.create(user=user, package=package, stars=rating_value, description=request.POST.get('description', ''))
+            rating = Rating.objects.create(user=user, booking=booking, stars=rating_value, description=request.POST.get('description', ''))
 
         return redirect(history_journeys)
 
@@ -1938,6 +2200,9 @@ def add_custom_passenger(request, package_id):
         proof_of_id_list = request.FILES.getlist('proof_of_id')
         children = request.POST.get('children')
         print(passenger_name_list,children,boarding,starting_date, passenger_limit)
+        if not passenger_name_list or not passenger_age_list or not proof_of_id_list or not boarding:
+            messages.error(request, 'Please fill out all required fields.')
+            return redirect('add_custom_passenger', package_id=package_id)
 
         # Check if the number of entries in all lists match
         if len(passenger_name_list) == len(passenger_age_list) == len(proof_of_id_list):
@@ -1947,7 +2212,7 @@ def add_custom_passenger(request, package_id):
             booking = CustomBooking(
                 package_id=package_id,
                 user_id=user_id,
-                status='Pending',  # Set the status to 'Confirmed' or 'Pending' as needed
+                status='Confirmed',  # Set the status to 'Confirmed' or 'Pending' as needed
                 passenger_limit=passenger_limit,
                 children=children,
                 boarding=boarding,
@@ -1971,12 +2236,12 @@ def add_custom_passenger(request, package_id):
                 )
                 passenger.save()
 
-            messages.success(request, "Your Booking Procedures have been Initialized. Stay Connected for getting further Updates.") 
-            return redirect('thome')            
-
+            messages.success(request, "Your Booking Procedures have been Initialized. Stay Connected for getting further Updates.")
+            
         else:
             # Handle the case where the number of entries in lists don't match
             messages.success(request, "Upload ID Proof of Number of Passengers Entered for Booking.")
+        return redirect('custom_payment',booking_id=booking.id)
     else:
         return render(request, 'add_custom_passenger.html', {'package': package, 'package_id': package_id})
 
@@ -2194,7 +2459,134 @@ def delete_custom_passenger(request, passenger_id):
     return redirect('custom_passenger_details', booking_id=passenger.booking.id)
 
 
+from datetime import datetime
+def account_details(request, booking_id):
+    booking = get_object_or_404(CustomBooking, pk=booking_id)
+    payment = get_object_or_404(CustomPayment, booking=booking, is_paid=True)
+    refund_amount = payment.amount
+    package_amount = booking.package.price  * booking.passenger_limit
 
+    # Calculate days until journey
+    start_date = booking.start_date
+    cancel_date = booking.updated_at.date()
+    days_until_journey = (start_date - cancel_date).days
+
+    # Calculate actual refund amount based on days until journey
+    if days_until_journey < 4:
+        actual_refund_amount = refund_amount * Decimal(0.20)
+    elif 4 <= days_until_journey < 8:
+        actual_refund_amount = refund_amount * Decimal(0.50)
+    elif 8 <= days_until_journey < 10:
+        actual_refund_amount = refund_amount * Decimal(0.90)
+    else:
+        actual_refund_amount = refund_amount - (package_amount * Decimal(0.15))
+    if request.method == 'POST':
+        name=request.POST['name']
+        account_number=request.POST['account_number']
+        ifsc_code=request.POST['ifsc_code']
+        amount=Decimal(actual_refund_amount)
+
+        refund = Refund(
+        user=request.user,  # Assuming user is authenticated
+        booking=booking,    # Assuming you have the booking object
+        name=name,
+        account_number=account_number,
+        ifsc_code=ifsc_code,
+        amount=amount,
+        is_refunded=False,  # Assuming initially it's not refunded
+    )
+    # Save the refund instance to the database
+        refund.save()
+    print(booking.id)
+
+    return render(request, 'account_details.html', {'refund_amount': refund_amount,
+                                                         'days_until_journey': days_until_journey,
+                                                         'actual_refund_amount': Decimal(actual_refund_amount),'booking_id':booking_id })
+
+def accounts(request, booking_id):
+    booking = get_object_or_404(Booking, pk=booking_id)
+    payment = get_object_or_404(Payment, booking=booking, is_paid=True)
+    refund_amount = payment.amount
+
+    # Calculate days until journey
+    start_date = booking.start_date
+    cancel_date = booking.updated_at.date()
+    print("Cancel date",cancel_date)
+    days_until_journey = (start_date - cancel_date).days
+
+    # Calculate actual refund amount based on days until journey
+    if days_until_journey < 4:
+        actual_refund_amount = refund_amount * Decimal(0.20)
+    elif 4 <= days_until_journey < 8:
+        actual_refund_amount = refund_amount * Decimal(0.50)
+    elif 8 <= days_until_journey < 10:
+        actual_refund_amount = refund_amount * Decimal(0.90)
+    else:
+        actual_refund_amount = refund_amount - (refund_amount * Decimal(0.15))
+    if request.method == 'POST':
+        name=request.POST['name']
+        account_number=request.POST['account_number']
+        ifsc_code=request.POST['ifsc_code']
+        amount=Decimal(actual_refund_amount)
+
+        refund = Accounts(
+        user=request.user,  # Assuming user is authenticated
+        booking=booking,    # Assuming you have the booking object
+        name=name,
+        account_number=account_number,
+        ifsc_code=ifsc_code,
+        amount=amount,
+        is_refunded=False,  # Assuming initially it's not refunded
+        )
+    # Save the refund instance to the database
+        refund.save()
+        print(booking.id)
+        return redirect('/thome')
+    else:
+
+        return render(request, 'accounts.html', {'refund_amount': refund_amount,
+                                                         'days_until_journey': days_until_journey,
+                                                         'actual_refund_amount': actual_refund_amount,'booking_id':booking_id })
+
+def process_ifsc_code(request):
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        ifsc_code = request.POST.get('ifsc_code')
+
+        # Make request to Razorpay API
+        url = f"https://ifsc.razorpay.com/{ifsc_code}"
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            bank_name = data.get('BANK')
+            branch = data.get('BRANCH')
+            city = data.get('CITY')
+            state = data.get('STATE')
+            print(bank_name)
+            return JsonResponse({'bank_name': bank_name, 'branch': branch, 'city': city, 'state': state})
+        else:
+            return JsonResponse({'error': 'Failed to retrieve bank details'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+def export_analysis_data_to_excel(request):
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+
+    worksheet.append(['Package', 'Number of Booking', 'Amount Generated'])
+
+    packages = CustomPackage.objects.all()
+
+    for package in packages:
+        bookings = CustomBooking.objects.filter(status='Confirmed',package=package, start_date__gte=timezone.now())
+        total_amount = CustomPayment.objects.filter(booking__in=bookings, is_paid=True).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+        worksheet.append([package.name, bookings.count(), total_amount])
+
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="analysis_data.xlsx"'
+    workbook.save(response)
+
+    return response
 # views.py
 
 # views.py
@@ -2212,34 +2604,64 @@ import base64
 from io import BytesIO
 from PIL import Image
 
+import numpy as np
+import base64
+from PIL import Image
+from io import BytesIO
+from django.shortcuts import render
+from tensorflow.keras.models import load_model
+
+# Load the mountain classifier model
+
+# Define the preprocess_image function
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
+
+mountain_classifier_model = load_model("D:/Testing Folder of MainPro/Main-Project-121e96f2003a0de6d3de726db22e4ee293b53545/MYPROJECT8/mountain_classifier_model.h5")
+
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
 def preprocess_image(image_content):
-    img = Image.open(BytesIO(image_content))
-    img = img.resize((224, 224))  # Resize to a consistent size
-    img_array = np.array(img) / 255.0  # Normalize pixel values to [0, 1]
+    img = load_img(BytesIO(image_content), target_size=(224, 224))  # Load and resize the image
+    img_array = img_to_array(img)  # Convert image to numpy array
+    img_array /= 255.0  # Normalize pixel values
     return img_array
+
+
+
+def predict_mountain(image_path):
+    img_array = preprocess_image(image_path)
+    prediction = mountain_classifier_model.predict(img_array)
+    if prediction[0][0] >= 0.5:
+        return "Mountain"
+    else:
+        return "Not a Mountain"
 
 def predict_elevation_view(request):
     predicted_elevation = None
     uploaded_image_base64 = None
+    message = None  # Define message variable here
 
     if request.method == 'POST' and request.FILES['file']:
         image = request.FILES['file']
+        print("Image path is;",image)
+        img_array = preprocess_image(image.read())  # Preprocess the image
 
-        # Preprocess the image
-        img_array = preprocess_image(image.read())  # Pass the binary content directly
-
-        # Make the prediction
-        prediction = model.predict(np.expand_dims(img_array, axis=0))
-
-        # Extract the predicted elevation
-        predicted_elevation = prediction[0][0]
-
-        # Encode the image in base64 for display in HTML
-        uploaded_image_base64 = base64.b64encode(image.read()).decode('utf-8')
+        # Check if the uploaded image is a mountain
+        is_mountain = mountain_classifier_model.predict(np.expand_dims(img_array, axis=0))
+        print(is_mountain)
+        if is_mountain[0][0] == 1. or is_mountain[0][0] > 0.5 :
+            # Proceed with elevation prediction
+            prediction = model.predict(np.expand_dims(img_array, axis=0))
+            predicted_elevation = prediction[0][0]
+            uploaded_image_base64 = base64.b64encode(image.read()).decode('utf-8')
+        else:
+            # Render a response with a message indicating that the image is not a mountain
+            message = "Upload the image of the Mountain"
 
     # Render a response using a template
-    return render(request, 'upload_image.html', {'predicted_elevation': predicted_elevation, 'uploaded_image': uploaded_image_base64})
+    return render(request, 'upload_image.html', {'predicted_elevation': predicted_elevation, 'uploaded_image': uploaded_image_base64, 'message': message})
+
+
 
 def testpage_view(request):
     user = User.objects.get(id=request.user.id)

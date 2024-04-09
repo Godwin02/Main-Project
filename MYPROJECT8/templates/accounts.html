@@ -1,0 +1,247 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upcoming Journeys</title>
+    <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'Niwi_Travels/css/style.css' %}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+
+
+
+        /* Style the form */
+        form {
+            width: 300px; /* Adjust width as needed */
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff; /* Form background color */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Form shadow */
+            justify-content: center;
+            align-items: center;
+            display: block;
+            margin-left: 615px;
+
+        }
+
+        /* Style form elements */
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50; /* Button background color */
+            color: white; /* Button text color */
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049; /* Button hover color */
+        }
+    </style>
+    
+</head>
+<body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+    
+    <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light site-navbar-target" id="ftco-navbar">
+        <div class="container">
+            <img src="{% static 'Niwi_Travels/images/niwilogo.jpg' %}" alt="Logo" width="40px" height="35px"> <a class="navbar-brand" href="#">NIWI TRAVELS</a>
+
+
+          <div class="collapse navbar-collapse" id="ftco-nav">
+            <ul class="navbar-nav nav ml-auto">
+                
+              <li class="nav-item"><a href="/thome" class="nav-link"><span style="color: #fff;">Home</span></a></li>
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" style="color: #fff;">
+                    {{ user.username }}
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="/upcoming-journeys" id="#" style=" background-color: rgb(42, 165, 67);text-align: center; margin-top: 10px;">Upcoming Journeys</a>
+                    <a class="dropdown-item" href="/ongoing-journeys" id="#" style=" background-color: rgb(218, 180, 13);text-align: center; margin-top: 10px;">Ongoing Trips</a>
+                    <a class="dropdown-item" href="/history-journeys" id="#" style=" background-color: rgb(234, 0, 0);text-align: center;margin-top: 10px">History</a>
+                    <a class="dropdown-item" href="/viewprofileT" style=" background-color: rgb(151, 140, 245);text-align: center;margin-top: 10px">View Profile</a>
+                    <a class="dropdown-item" href="/tupdate" id="#" style=" background-color: rgb(195, 67, 172);text-align: center;margin-top: 10px">Update Profile</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="/logout" id="logout-link" style="color: rgb(255, 0, 0); background-color: rgb(40, 38, 38); text-align: center;margin-top: 10px">Logout</a>
+                </div>
+            </li>
+            </ul>
+            
+          </div>
+        </div>
+      </nav>
+<br><br>
+<h2 style="text-align: center;">User Bank Details </h2>
+
+<form id="account-details-form" method="post" action="{% url 'accounts' booking_id=booking_id %}">
+    {% csrf_token %}
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required><br>
+    <small id="name-error" style="color: red;"></small><br>
+
+    <label for="account_number">Account Number:</label>
+    <input type="text" id="account_number" name="account_number" required><br>
+    <small id="account-number-error" style="color: red;"></small><br>
+
+    <label for="ifsc_code">IFSC Code:</label>
+    <input type="text" id="ifsc_code" name="ifsc_code" required><br>
+    <small id="ifsc-code-error" style="color: red;"></small><br>
+
+    <button type="submit">Submit</button>
+
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#refundPolicyModal">
+        View Refund Policy and Amount
+    </button>
+    
+  
+  <!-- Refund Policy Modal -->
+  <div class="modal fade" id="refundPolicyModal" tabindex="-1" role="dialog" aria-labelledby="refundPolicyModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="refundPolicyModalLabel">Refund Policy</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            Cancellation is not possible just 48 hours before the journey. If the cancellation is made less than 4 days before the journey, a refund of 20% of the booking amount will be provided. If the cancellation is made between 4 and 8 days before the journey, a refund of 50% will be provided. For cancellations made between 8 and 10 days before the journey, a refund of 80% will be provided. Cancellations made more than 10 days before the journey are eligible for a refund of the booking amount after deducting the tax amount.
+            For your booking a cancellation amount of {{ actual_refund_amount|floatformat:0 }} will refunded to your account within 3 working days. Thank you for contacting NIWI TRAVELS. See you soon.
+            </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</form>
+
+
+<script>
+    // Function to validate name field
+// Function to validate name field
+function validateName() {
+    var nameInput = document.getElementById('name');
+    var nameError = document.getElementById('name-error');
+    var nameRegex = /^[A-Za-z\s]{3,25}$/; // Regular expression to match alphabets only
+
+    if (!nameInput.value) {
+        nameError.textContent = 'Name is required';
+        return false;
+    } else if (!nameRegex.test(nameInput.value)) {
+        nameError.textContent = 'Enter valid name and not exceeding  25 characters';
+        return false;
+    } else {
+        nameError.textContent = '';
+        return true;
+    }
+}
+
+// Event listener for input event on the name field
+document.getElementById('name').addEventListener('input', function() {
+    validateName(); // Call the validateName function on input event
+});
+
+    // Function to validate account number field
+    // Function to validate account number field
+function validateAccountNumber() {
+    var accountNumberInput = document.getElementById('account_number');
+    var accountNumberError = document.getElementById('account-number-error');
+    var accountNumberRegex = /^\d+$/; // Regular expression to match numbers only
+
+    if (!accountNumberInput.value) {
+        accountNumberError.textContent = 'Account number is required';
+        return false;
+    } else if (!accountNumberRegex.test(accountNumberInput.value)) {
+        accountNumberError.textContent = 'Enter a valid account number';
+        return false;
+    } else if (accountNumberInput.value.length < 12 || accountNumberInput.value.length > 15) {
+        accountNumberError.textContent = 'Enter a valid account number';
+        return false;
+    } else {
+        accountNumberError.textContent = '';
+        return true;
+    }
+}
+
+// Event listener for input event on the account number field
+document.getElementById('account_number').addEventListener('input', function() {
+    validateAccountNumber(); // Call the validateAccountNumber function on input event
+});
+
+
+    // Function to validate IFSC code field
+// Function to validate IFSC code field
+function validateIFSCCode() {
+    var ifscCodeInput = document.getElementById('ifsc_code');
+    var ifscCodeError = document.getElementById('ifsc-code-error');
+    var ifscCodeRegex = /^(SBIN|PUNB|BARB|BKID|CNRB|UBIN|IDIB|ICIC|HDFC|UTIB)\d{7}$/; // Regular expression to match specified 4-letter bank codes followed by 7 digits
+
+    if (!ifscCodeInput.value) {
+        ifscCodeError.textContent = 'IFSC code is required';
+        return false;
+    } else if (!ifscCodeRegex.test(ifscCodeInput.value)) {
+        ifscCodeError.textContent = 'Enter a valid IFSC code.';
+        return false;
+    } else {
+        ifscCodeError.textContent = '';
+        return true;
+    }
+}
+
+// Event listener for input event on the IFSC code field
+document.getElementById('ifsc_code').addEventListener('input', function() {
+    validateIFSCCode(); // Call the validateIFSCCode function on input event
+});
+
+
+    // Function to validate the entire form
+    function validateForm() {
+        var isNameValid = validateName();
+        var isAccountNumberValid = validateAccountNumber();
+        var isIFSCCodeValid = validateIFSCCode();
+        return isNameValid && isAccountNumberValid && isIFSCCodeValid;
+    }
+
+    // Event listener for form submission
+    document.getElementById('account-details-form').addEventListener('submit', function(event) {
+        if (!validateForm()) {
+            event.preventDefault(); // Prevent form submission if validation fails
+        }
+    });
+</script>
+
+<!-- Add Bootstrap JS and other scripts if needed -->
+<!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

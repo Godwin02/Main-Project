@@ -123,8 +123,8 @@
                 <div class="card">
                     <!-- Display the first image if available -->
                     <a href="/package/{{ package_with_images.package.id }}?from_upcoming_journeys=true">
-                        {% if package_with_images.images.first %}
-                            <img src="{{ package_with_images.images.first.image.url }}" class="card-img-top" alt="Package Image">
+                        {% if package_with_images.images %}
+                            <img src="{{ package_with_images.images.image.url }}" class="card-img-top" alt="Package Image">
                         {% else %}
                             <img src="{% static 'path_to_default_image.jpg' %}" class="card-img-top" alt="Default Image">
                         {% endif %}
@@ -138,46 +138,46 @@
                         {% if package_with_images.rating.stars %}
                             <!-- Display existing rating in filled star format -->
                             <label>Rating:</label>
-                            <div class="star-rating" data-package-id="{{ package_with_images.package.id }}">
+                            <div class="star-rating" data-package-id="{{ package_with_images.booking.id }}">
                                 {% for i in ''|rjust:package_with_images.rating.stars %}
                                     {% if package_with_images.rating.stars|default:0 > i %}
-                                        <span class="star selected" data-rating="{{ i }}" onclick="handleStarClick('{{ package_with_images.package.id }}', '{{ i }}')">&#9734;</span>
+                                        <span class="star selected" data-rating="{{ i }}" onclick="handleStarClick('{{ package_with_images.booking.id }}', '{{ i }}')">&#9734;</span>
                                     {% else %}
-                                        <span class="star" style="color: gold;" data-rating="{{ i }}" onclick="handleStarClick('{{ package_with_images.package.id }}', '{{ i }}')">&#9733;</span>
+                                        <span class="star" style="color: gold;" data-rating="{{ i }}" onclick="handleStarClick('{{ package_with_images.booking.id }}', '{{ i }}')">&#9733;</span>
                                     {% endif %}
                                 {% endfor %}
-                                <form method="post" action="{% url 'submit_rating' package_with_images.package.id 0 %}">
+                                <form method="post" action="{% url 'submit_rating' package_with_images.booking.id 0 %}">
                                     {% csrf_token %}
                                     <div>
                                         <label for="rating">Edit your Rating:</label><br>
                                         <input type="text" name="description" style="font-size: medium; font-family: 'Times New Roman', Times, serif; border-radius: 10px; border: 1px solid red;" id="description_input" value="{{ package_with_images.rating.description }}">
                                     </div>
-                                    <div class="star-rating" data-package-id="{{ package_with_images.package.id }}">
+                                    <div class="star-rating" data-package-id="{{ package_with_images.booking.id }}">
                                         {% for i in ''|rjust:5 %}
                                             {% with forloop.counter as rating %}
-                                                <span class="star" name="stars" id="star{{ package_with_images.package.id }}_{{ rating }}" data-rating="{{ rating }}" onclick="handleStarClick('{{ package_with_images.package.id }}', '{{ rating }}')" onmouseover="handleStarHover('{{ package_with_images.package.id }}', '{{ rating }}')" onmouseout="handleStarMouseOut('{{ package_with_images.package.id }}')">&#9733;</span>
+                                                <span class="star" name="stars" id="star{{ package_with_images.booking.id }}_{{ rating }}" data-rating="{{ rating }}" onclick="handleStarClick('{{ package_with_images.booking.id }}', '{{ rating }}')" onmouseover="handleStarHover('{{ package_with_images.booking.id }}', '{{ rating }}')" onmouseout="handleStarMouseOut('{{ package_with_images.booking.id }}')">&#9733;</span>
                                             {% endwith %}
                                         {% endfor %}
-                                        <input type="hidden" name="stars" id="stars_input_{{ package_with_images.package.id }}" value=""><br>
+                                        <input type="hidden" name="stars" id="stars_input_{{ package_with_images.booking.id }}" value=""><br>
                                         <button type="submit">Submit Rating</button>
                                     </div>
                                 </form>
                             </div>
                         {% else %}
                             <!-- Add a form to submit a rating if not already rated -->
-                            <form method="post" action="{% url 'submit_rating' package_with_images.package.id 0 %}">
+                            <form method="post" action="{% url 'submit_rating' package_with_images.booking.id 0 %}">
                                 {% csrf_token %}
                                 <div>
                                     <label>Your Experience with Niwi Travels:</label>
                                     <input type="text" name="description" id="description_input" > 
                                 </div>
-                                <div class="star-rating" data-package-id="{{ package_with_images.package.id }}">
+                                <div class="star-rating" data-package-id="{{ package_with_images.booking.id }}">
                                     {% for i in ''|rjust:5 %}
                                         {% with forloop.counter as rating %}
-                                            <span class="star" name="stars" id="star{{ package_with_images.package.id }}_{{ rating }}" data-rating="{{ rating }}" onclick="handleStarClick('{{ package_with_images.package.id }}', '{{ rating }}')" onmouseover="handleStarHover('{{ package_with_images.package.id }}', '{{ rating }}')" onmouseout="handleStarMouseOut('{{ package_with_images.package.id }}')">&#9733;</span>
+                                            <span class="star" name="stars" id="star{{ package_with_images.booking.id }}_{{ rating }}" data-rating="{{ rating }}" onclick="handleStarClick('{{ package_with_images.booking.id }}', '{{ rating }}')" onmouseover="handleStarHover('{{ package_with_images.booking.id }}', '{{ rating }}')" onmouseout="handleStarMouseOut('{{ package_with_images.booking.id }}')">&#9733;</span>
                                         {% endwith %}
                                     {% endfor %}
-                                    <input type="hidden" name="stars" id="stars_input_{{ package_with_images.package.id }}" value="">
+                                    <input type="hidden" name="stars" id="stars_input_{{ package_with_images.booking.id }}" value="">
                                     <button type="submit">Submit Rating</button>
                                 </div>
                             </form>
@@ -236,12 +236,47 @@
 
              </script>
         {% endfor %}
+
+        {% for package_with_images in cancelled_bookings %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <!-- Display the first image if available -->
+                    <a href="/package/{{ package_with_images.package.id }}?from_upcoming_journeys=true">
+                        {% if package_with_images.images %}
+                            <img src="{{ package_with_images.images.image.url }}" class="card-img-top" alt="Package Image">
+                        {% else %}
+                            <img src="{% static 'path_to_default_image.jpg' %}" class="card-img-top" alt="Default Image">
+                        {% endif %}
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ package_with_images.package.package_name }}</h5>
+                        <p class="card-text">Start Date: {{ package_with_images.package.start_date }}</p>
+                        <p class="card-text">End Date: {{ package_with_images.package.end_date }}</p>
+                        <p class="card-text">Booking was Cancelled</p>
+                        {% if package_with_images.booking.payment == 'Pending' %}
+                        
+                        {% elif package_with_images.booking.payment == 'Paid' %}
+                       
+                        {% if package_with_images.booking.id in all_bookings %}
+                        <p class="card-text">Refund applied</p>
+                        {% else %}
+                        
+                            <button type="submit" class="btn btn-success"><a href="/accounts/{{ package_with_images.booking.id }}" style="color: #fff;"> Apply Refund</a></button>
+                        </form>
+                           
+                        {% endif %}
+                    {% endif %}
+                    </div>
+                </div> 
+            </div>
+        {% endfor %}
+
     </div>
 
             <h1>History of Custom Journeys</h1>
             <p style="font-size: 20px;font-weight: bold;">Stay Safe and Stay Connected. We are Happy to See You Soon.</p>
             <div class="row">
-                {% for journey in history_custom_journeys %}
+{% for journey in history_custom_journeys %}
                     <div class="col-md-4 mb-4">
                         <div class="card">
                             <!-- Display the first image if available -->
@@ -257,74 +292,99 @@
                                 <p class="card-text">Category: {{ journey.package.category }}</p>
                                 <p class="card-text">Start Date: {{ journey.start_date }}</p>
                                 <p class="card-text">Boarding: {{ journey.boarding }}</p>
-            {% if journey.status == 'Cancelled' %}
-            <p class="card-text">Booking was Cancelled</p>
-            {% elif journey.status == 'Pending' %}
-            <p class="card-text">Booking was not completed</p>
-            {% else %}
-
-                                <!-- Display rating in star format -->
-                                {% if c_rating %}
-
-                                {% for ratings_queryset in c_rating %}
-                                {% for rating in ratings_queryset %}
-                                    {% if rating.booking_id == journey.id %}
-                                    <!-- Display existing rating in filled star format -->
-                                    <label>Rating:</label>
-                                    <div class="star-rating" data-package-id="{{ journey.id }}">
-                                        {% for i in ''|rjust:rating.stars %}
-                                            {% if rating.stars|default:0 > i %}
-                                                <span class="star selected" data-rating="{{ i }}" onclick="handleStarClick('{{ journey.id }}', '{{ i }}')">&#9734;</span>
-                                            {% else %}
-                                                <span class="star" style="color: gold;" data-rating="{{ i }}" onclick="handleStarClick('{{ journey.id }}', '{{ i }}')">&#9733;</span>
-                                            {% endif %}
-                                        {% endfor %}
-
-
-                                        <form method="post" action="{% url 'submit_custom_rating' journey.id 0 %}">
-                                            {% csrf_token %}
-                                            <div>
-                                                <label for="rating">Edit your Rating:</label><br>
-                                                <input type="text" name="description" style="font-size: medium; font-family: 'Times New Roman', Times, serif; border-radius: 10px; border: 1px solid red;" id="description_input" value="{{ rating.description }}">
-                                            </div>
-                                            <div class="star-rating" data-package-id="{{ journey.id }}">
-                                                {% for i in ''|rjust:5 %}
-                                                    {% with forloop.counter as rating %}
-                                                        <span class="star" name="stars" id="star{{ journey.id }}_{{ rating }}" data-rating="{{ rating }}" onclick="handleStarClick('{{ journey.id }}', '{{ rating }}')" onmouseover="handleStarHover('{{ journey.id }}', '{{ rating }}')" onmouseout="handleStarMouseOut('{{ journey.id }}')">&#9733;</span>
-                                                    {% endwith %}
-                                                {% endfor %}
-                                                <input type="hidden" name="stars" id="stars_input_{{ journey.id }}" value=""><br>
-                                                <button type="submit">Submit Rating</button>
-                                            </div>
+                            <!-- {% if journey.status == 'Cancelled' %}
+                                    <p class="card-text">Booking was Cancelled</p>
+                                        {% if journey.payment == 'Pending' %}
+                                      
+                                        {% elif journey.payment == 'Paid' %}
+                                    
+                                        {% if journey.id in all_bookings %}
+                                        <p class="card-text">Refund applied</p>
+                                        {% else %}
+                                            <button type="submit" class="btn btn-success"><a href="/account-details/{{ journey.id }}"> Apply Refund</a></button>
                                         </form>
-                                    </div>
+                                            <span style="font-weight: 100;">Apply for refund</span>
+                                        {% endif %}
                                     {% endif %}
-                                    {% endfor %}
-                                {% endfor %}
-                                {% else %}
-                                    <!-- Add a form to submit a rating if not already rated -->
-                                    <form method="post" action="{% url 'submit_custom_rating' journey.id 0 %}">
-                                        {% csrf_token %}
-                                        <div>
-                                            <label>Your Experience with Niwi Travels:</label>
-                                            <input type="text" name="description" id="description_input" > 
-                                        </div>
-                                        <div class="star-rating" data-package-id="{{ journey.id }}">
-                                            {% for i in ''|rjust:5 %}
-                                                {% with forloop.counter as rating %}
-                                                    <span class="star" name="stars" id="star{{ journey.id }}_{{ rating }}" data-rating="{{ rating }}" onclick="handleStarClick('{{ journey.id }}', '{{ rating }}')" onmouseover="handleStarHover('{{ journey.id }}', '{{ rating }}')" onmouseout="handleStarMouseOut('{{ journey.id }}')">&#9733;</span>
-                                                {% endwith %}
-                                            {% endfor %}
-                                            <input type="hidden" name="stars" id="stars_input_{{ journey.id }}" value="">
-                                            <button type="submit">Submit Rating</button>
-                                        </div>
-                                    </form>
-                                {% endif %}
-                            </div>
-                        </div>
+                            {% endif %} -->
+                            {% if journey.status == 'Pending' %}
+                                    <p class="card-text">Booking was not completed</p>
+                            {% endif %}
+{% if journey.status == 'Confirmed'  and journey.payment == 'Paid' %}
+    <!-- Display rating in star format -->
+    {% for rating in c_rating %}
+        {% if rating.booking_id == journey.id %}
+            <!-- Display existing rating in filled star format -->
+            <label>Rating:</label>
+            <div class="star-rating" data-package-id="{{ journey.id }}">
+                {% for i in ''|rjust:rating.stars %}
+                    {% if rating.stars|default:0 > i %}
+                        <span class="star selected" data-rating="{{ i }}" onclick="handleStarClick('{{ journey.id }}', '{{ i }}')">&#9734;</span>
+                    {% else %}
+                        <span class="star" style="color: gold;" data-rating="{{ i }}" onclick="handleStarClick('{{ journey.id }}', '{{ i }}')">&#9733;</span>
                     {% endif %}
-                    </div>
+                {% endfor %}
+            </div>
+            <form method="post" action="{% url 'submit_custom_rating' journey.id 0 %}">
+                {% csrf_token %}
+                <div>
+                    <label for="rating">Edit your Rating:</label><br>
+                    <input type="text" name="description" style="font-size: medium; font-family: 'Times New Roman', Times, serif; border-radius: 10px; border: 1px solid red;" id="description_input" value="{{ rating.description }}">
+                </div>
+                <div class="star-rating" data-package-id="{{ journey.id }}">
+                    {% for i in ''|rjust:5 %}
+                        {% with forloop.counter as star_rating %}
+                            <span class="star" name="stars" id="star{{ journey.id }}_{{ star_rating }}" data-rating="{{ star_rating }}" onclick="handleStarClick('{{ journey.id }}', '{{ star_rating }}')" onmouseover="handleStarHover('{{ journey.id }}', '{{ star_rating }}')" onmouseout="handleStarMouseOut('{{ journey.id }}')">&#9733;</span>
+                        {% endwith %}
+                    {% endfor %}
+                    <input type="hidden" name="stars" id="stars_input_{{ journey.id }}" value=""><br>
+                    <button type="submit">Submit Rating</button>
+                </div>
+            </form>
+        {% endif %}
+        
+    {% endfor %}
 
+    {% if journey.id not in c_rating_booking_ids %}
+        <form method="post" action="{% url 'submit_custom_rating' journey.id 0 %}">
+            {% csrf_token %}
+            <div>
+                <label>Your Experience with Niwi Travels:</label>
+                <input type="text" name="description" id="description_input">
+            </div>
+            <div class="star-rating" data-package-id="{{ journey.id }}">
+                {% for i in ''|rjust:5 %}
+                    {% with forloop.counter as star_rating %}
+                        <span class="star" name="stars" id="star{{ journey.id }}_{{ star_rating }}" data-rating="{{ star_rating }}" onclick="handleStarClick('{{ journey.id }}', '{{ star_rating }}')" onmouseover="handleStarHover('{{ journey.id }}', '{{ star_rating }}')" onmouseout="handleStarMouseOut('{{ journey.id }}')">&#9733;</span>
+                    {% endwith %}
+                {% endfor %}
+                <input type="hidden" name="stars" id="stars_input_{{ journey.id }}" value=""><br>
+                <button type="submit">Submit Rating</button>
+            </div>
+        </form>
+    {% endif %}
+
+{% endif %}
+                                <!-- <form method="post" action="{% url 'submit_custom_rating' journey.id 0 %}">
+                                    {% csrf_token %}
+                                    <div>
+                                        <label>Your Experience with Niwi Travels:</label>
+                                        <input type="text" name="description" id="description_input" > 
+                                    </div>
+                                    <div class="star-rating" data-package-id="{{ journey.id }}">
+                                        {% for i in ''|rjust:5 %}
+                                            {% with forloop.counter as rating %}
+                                                <span class="star" name="stars" id="star{{ journey.id }}_{{ rating }}" data-rating="{{ rating }}" onclick="handleStarClick('{{ journey.id }}', '{{ rating }}')" onmouseover="handleStarHover('{{ journey.id }}', '{{ rating }}')" onmouseout="handleStarMouseOut('{{ journey.id }}')">&#9733;</span>
+                                            {% endwith %}
+                                        {% endfor %}
+                                        <input type="hidden" name="stars" id="stars_input_{{ journey.id }}" value="">
+                                        <button type="submit">Submit Rating</button>
+                                    </div>
+                                </form> -->
+                            
+                                </div>
+                            </div>
+                    </div>
 
             <script>
                 function handleStarClick(packageId, rating) {
@@ -377,6 +437,41 @@
 
              </script>
         {% endfor %}
+        {% for package_with_images in cancelled_custom_bookings %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <!-- Display the first image if available -->
+                <a href="{% url 'custom_package_detail' package_with_images.package.id %}">
+                    {% if package_with_images.package.package_image %}
+                        <img src="{{ package_with_images.package.package_image.url }}" class="card-img-top" alt="Package Image">
+                    {% else %}
+                        <img src="{% static 'path_to_default_image.jpg' %}" class="card-img-top" alt="Default Image">
+                    {% endif %}
+                </a>
+                <div class="card-body">
+                        <h5 class="card-title">{{ package_with_images.package.name }}</h5>
+                        <p class="card-text">Category: {{ package_with_images.package.category }}</p>
+                        <p class="card-text">Start Date: {{ package_with_images.booking.start_date }}</p>
+                        <p class="card-text">Boarding: {{ package_with_images.booking.boarding }}</p>
+                    <p class="card-text">Booking was Cancelled</p>
+                    {% if package_with_images.booking.payment == 'Pending' %}
+                    
+                    {% elif package_with_images.booking.payment == 'Paid' %}
+                   
+                    {% if package_with_images.booking.id in all_booking %}
+                    <p class="card-text">Refund applied</p>
+                    {% else %}
+                    
+                        <button type="submit" class="btn btn-success"><a href="/account-details/{{ package_with_images.booking.id }}" style="color: #fff;"> Apply Refund</a></button>
+                    </form>
+                    {% endif %}
+                {% endif %}
+                </div>
+            </div> 
+        </div>
+    {% endfor %}
+
+
     </div>
     
     

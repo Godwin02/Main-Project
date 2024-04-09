@@ -220,15 +220,12 @@ p {
             </div>
 
             <!-- Add a "Book Now" button -->
-            <form method="POST" action="{% url 'add_passenger' package.id %}">
                 <input type="hidden" name="package.id" value="{{ package.id }}">
                 {% csrf_token %}
                 {% if user.is_authenticated %}
-                {% if not passenger %}
-                {% if not from_upcoming_journeys %}
-                <button type="submit">Book Now</button>
-                {% endif %}
-                {% endif %}
+                <button style="background-color: #007BFF; border-radius: 10px;">
+                    <a href="{% url 'add_passenger' package.id %}" style="text-decoration: none; color: white; display: inline-block; ">Book Now</a>
+                </button>
                 {% else %}
                 <a href="/log">Click Here to Login and Book Your Destination Soon.</a>
                 {% endif %}

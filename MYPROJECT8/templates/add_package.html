@@ -490,7 +490,8 @@
                 </tr>
             </table>
             <br>
-            <input class="submit-button" type="submit" value="Upload Package">
+            <input class="submit-button" type="submit" value="Upload Package" onclick="return validateForm();">
+
         </form>
     </div>
 
@@ -676,10 +677,30 @@ if (!isNaN(duration)) {
                 activitiesValidationMessage.textContent = '';
             }
         }
-function validateImages() {
-    // You can add custom validation rules for the images field here
-    // Example: Check if the uploaded images meet specific criteria.
+    
+    
+        function validateImages() {
+    const files = imagesInput.files;
+
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
+
+        if (!allowedTypes.includes(file.type)) {
+            imagesValidationMessage.textContent = 'Only PNG, JPEG, JPG, and SVG images are allowed.';
+            return;
+        }
+
+        const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
+        if (file.size > maxSizeInBytes) {
+            imagesValidationMessage.textContent = 'File size exceeds the maximum allowed size of 5MB.';
+            return;
+        }
+    }
+
+    imagesValidationMessage.textContent = '';
 }
+
 
 function validateCategory() {
     if (categoryInput.value.trim() === '') {
@@ -730,6 +751,35 @@ function validateCancellationPolicy() {
     
         // Add more validation functions for the other new fields as needed
     </script>
-    
+    <script>
+        function validateForm() {
+    // Check if any validation messages exist
+    if (
+        package_nameValidationMessage.textContent ||
+        descriptionValidationMessage.textContent ||
+        destinationValidationMessage.textContent ||
+        durationValidationMessage.textContent ||
+        priceValidationMessage.textContent ||
+        start_dateValidationMessage.textContent ||
+        end_dateValidationMessage.textContent ||
+        accommodationValidationMessage.textContent ||
+        transportationValidationMessage.textContent ||
+        activitiesValidationMessage.textContent ||
+        imagesValidationMessage.textContent ||
+        categoryValidationMessage.textContent ||
+        tagsValidationMessage.textContent ||
+        availabilityValidationMessage.textContent ||
+        booking_deadlineValidationMessage.textContent ||
+        cancellation_policyValidationMessage.textContent
+    ) {
+        // If any validation message exists, prevent form submission
+        return false;
+    }
+
+    // If no validation message exists, allow form submission
+    return true;
+}
+
+    </script>
 </body>
 </html>

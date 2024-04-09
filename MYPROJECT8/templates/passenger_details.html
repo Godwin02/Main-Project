@@ -110,7 +110,7 @@
         </div>
       </nav>
 <br><br>
-<h2 style="text-align: center;">Passenger Details for {{ package.package_name }}</h2>
+<h2 style="text-align: center;">Passenger Details for {{ booking.package.package_name }}</h2>
 
 <table class="table">
     <thead>
@@ -118,7 +118,9 @@
             <th>Name</th>
             <th>Age</th>
             <th>ID Proof</th>
+    {% if booking.payment == 'Pending' %}
             <th>Delete Passenger</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -127,9 +129,12 @@
                 <td>{{ passenger.passenger_name }}</td>
                 <td>{{ passenger.passenger_age }}</td>
                 <td><a href="{{ passenger.proof_of_id.url }}">View ID Proof</a></td>
+                {% if booking.payment == 'Pending' %}
+
                 <td>
                     <a href="{% url 'delete_passenger' passenger.id %}" class="btn btn-danger" style="color: #000000;">Delete❌</a>
                 </td>
+                {% endif %}
             </tr>
         {% endfor %}
     </tbody>

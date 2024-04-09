@@ -57,10 +57,10 @@ urlpatterns = [
     path('upcoming-journeys/', views.upcoming_journeys, name='upcoming_journeys'),
     path('history-journeys/', views.history_journeys, name='history_journeys'),
     path('ongoing-journeys/', views.ongoing_journeys, name='ongoing_journeys'),
-    path('cancel_booking/<int:package_id>/', views.cancel_booking, name='cancel_booking'),
+    path('cancel_booking/<int:booking_id>/', views.cancel_booking, name='cancel_booking'),
     path('bookings/', views.upcoming_bookings, name='admin_bookings'),
     path('verified_bookings/', views.verified_bookings, name='verified_bookings'),
-    path('passenger_count/<int:package_id>/', views.passenger_count, name='passenger_count'),
+    path('passenger_count/<int:booking_id>/', views.passenger_count, name='passenger_count'),
     path('ongoing-bookings/', views.ongoing_bookings, name='ongoing_journeys'),
     path('ongoing_passengers/<int:package_id>/', views.ongoing_passengers, name='ongoing_passengers'),
     path('history-bookings/', views.history_bookings, name='history_journeys'),
@@ -71,10 +71,10 @@ urlpatterns = [
     path('pay/<int:booking_id>/', views.pay, name='pay'),
     path('success/<int:booking_id>/',views.success, name='success'),
     path('package_requests/<int:package_id>/', views.package_requests, name='package_requests'),
-    path('passenger_details/<int:package_id>/', views.passenger_details, name='passenger_details'),
+    path('passenger_details/<int:booking_id>/', views.passenger_details, name='passenger_details'),
     path('delete_passenger/<int:passenger_id>/', views.delete_passenger, name='delete_passenger'),
     path('export-passenger-data/<int:package_id>/', export_passenger_data_to_excel, name='export_passenger_data_to_excel'),
-    path('submit_rating/<int:package_id>/<int:stars>/', views.submit_rating, name='submit_rating'),
+    path('submit_rating/<int:booking_id>/<int:stars>/', views.submit_rating, name='submit_rating'),
     path('download-receipt/<int:booking_id>/', views.download_receipt, name='download_receipt'),
 
 
@@ -101,7 +101,10 @@ urlpatterns = [
     path('custom_pay/<int:booking_id>/', views.custom_pay, name='custom_pay'),
     path('custom_success/<int:booking_id>/',views.custom_success, name='custom_success'),
     path('download_custom_receipt/<int:booking_id>/', views.download_custom_receipt, name='download_custom_receipt'),
-
+    path('account-details/<int:booking_id>/', views.account_details, name='account_details'),
+    path('accounts/<int:booking_id>/', views.accounts, name='accounts'),
+    path('export-analysis-data/', views.export_analysis_data_to_excel, name='export_analysis_data_to_excel'),
+    path('process-ifsc-code/', views.process_ifsc_code, name='process_ifsc_code'),
 
     path('search/', views.search_and_store_place, name='search_and_store_place'),
     path('get_place_suggestions/', views.get_place_suggestions, name='get_place_suggestions'),

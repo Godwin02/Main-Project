@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -7,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="icon" href="{% static 'Niwi_Travels/images/favicon.ico' %}" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Add your CSS stylesheets and JavaScript files here -->
     <style>
@@ -71,6 +73,68 @@
     margin: 0;
     font-size: 16px; /* Adjust the font size */
 }
+
+/* Styles for the main content */
+.main-content {
+    padding: 20px;
+}
+
+/* Styles for statistics sections */
+.statistics-section {
+    margin-bottom: 30px;
+}
+
+/* Styles for the table */
+.booking-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.booking-table th, .booking-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.booking-table th {
+    background-color: #f2f2f2;
+}
+
+.booking-table td {
+    text-align: center;
+}
+
+/* Add additional styles as needed */
+.booking-trends {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 24px;
+    margin-bottom: 15px;
+    text-align: center;
+    color: #333;
+}
+
+.booking-table {
+    width: 100%;
+}
+
+.booking-table th,
+.booking-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.booking-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
     </style>
 </head>
 <body>
@@ -95,8 +159,92 @@
         <p>This is where you can manage users, packages, and ongoing trips.</p>
     </div>
     <main>
-        {% block content %}{% endblock %}
+        {% block content %}
+        <div class="main-content">
+            <h1 style="text-align: center;">Booking Trends Analysis</h1>
+            <hr>
+            <div class="statistics-section">
+                <h2>Most Booked Package:</h2>
+                <p>The most booked package is <strong>{{ most_booked_package }}</strong>, with a total of <strong>{{ most_booked_package_count }}</strong> bookings.</p>
+                <p>Number of bookings for the most booked package within the last 30 days: <strong>{{ bookings_for_most_booked_package }}</strong></p>
+            </div>
+            <hr>
+            <div>
+                <a href="{% url 'export_analysis_data_to_excel' %}" class="btn btn-primary" style="text-decoration: none; color: black;">📁Download Analysis Data</a>
+            </div>
+            
+            <div class="container booking-trends">
+                <h2 class="section-title">Booking Trends</h2>
+                <table class="booking-table">
+                    <thead>
+                        <tr>
+                            <th>Package</th>
+                            {% for month in months %}
+                                <th>{{ month }}</th> <!-- Month column headers -->
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in booking_counts_list %}
+                        <tr style="background-color: {{ item.package|random_color }};"> <!-- Apply random color to each row -->
+                            <td>{{ item.package }}</td> <!-- Package row header -->
+                                {% for month in months %}
+                                    <td>{{ item|get_value_from_key:month }}</td> <!-- Access count using the month as the key, default to 0 if not present -->
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="statistics-section">
+                    <h2>Total Confirmed Bookings</h2>
+                    <p>Total confirmed bookings in the past month: {{ total_confirmed_past_month }}</p>
+                    <p>Total confirmed bookings in the Current month: {{ total_confirmed_current_month }}</p>
+                    <p>Total confirmed bookings in the upcoming months: {{ total_confirmed_upcoming_months }}</p>
+                </div>
+            </div>
+       
+
+
+        <canvas id="bookingChart" width="400px" height="200px"></canvas>
+
+        <script>
+            var ctx = document.getElementById('bookingChart').getContext('2d');
+
+            var data = {
+                labels: [{% for month, amount in booking_data %}
+                            "{{ month }}",
+                        {% endfor %}
+                        ],
+                datasets: [{
+                    label: 'Booking Amount',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1,
+                    data: [{% for month, amount in booking_data %}
+                                {{ amount }},
+                            {% endfor %}
+                        ]
+                }]
+            };
+
+            var myLineChart = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        </script>
+
+        {% endblock %}
+    </div>
+
     </main>
+    
     <script>
         // Wait for the document to be fully loaded
         document.addEventListener("DOMContentLoaded", function () {

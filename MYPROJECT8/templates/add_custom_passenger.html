@@ -156,6 +156,8 @@ option {
         <!-- Existing passenger information input fields -->
         <label for="passenger-limit">Enter the number of passengers:</label>
         <input type="number" id="passenger-limit" name="passenger-limit" min="1" value="1"><br>
+        <div id="passenger-error" style="color: red;"></div>
+
         <label for="children">Enter the number of children with age less than 6 years of old.:</label>
         <input type="number" id="children" name="children" max="10" value="0" min="0">
         <div id="children-error" style="color: red;"></div>
@@ -165,6 +167,7 @@ option {
             <span class="error-message" id="starting-date-error"></span>
         </div>
     <input type="text" id="searchInput" name="boarding_point" placeholder="Search for your boarding point">
+    <div id="searchInput-error" style="color: red;"></div>
      <script>
         $(function () {
             $("#searchInput").autocomplete({
@@ -280,6 +283,10 @@ Please note that the above terms and conditions are a general example and may ne
     // Real-time validation for the number of children
     const childrenInput = document.getElementById("children");
     const childrenError = document.getElementById("children-error");
+    const searchInput = document.getElementById("searchInput");
+    const searchInputError = document.getElementById("searchInput-error");
+    const limitInput = document.getElementById("passenger-limit");
+    const limitError = document.getElementById("passenger-error");
 
     childrenInput.addEventListener("input", function() {
         const numberOfChildren = parseInt(childrenInput.value);
@@ -292,6 +299,27 @@ Please note that the above terms and conditions are a general example and may ne
             childrenError.textContent = '';
         }
     });
+
+    limitInput.addEventListener("input", function() {
+        const numberOfPassenger = parseInt(limitInput.value);
+
+        if (isNaN(numberOfPassenger) || numberOfPassenger < 0) {
+            limitError.textContent = 'Enter a valid number of children.';
+        } else {
+            limitError.textContent = '';
+        }
+    });
+
+    searchInput.addEventListener("input", function(){
+        const  value = searchInput.value;
+        if (value === '') {
+                    searchInputError.textContent = 'Passenger Name is required.';
+                } else if (!/^[a-zA-Z\s]+$/.test(value)) {
+                    searchInputError.textContent = 'Passenger Name can only contain alphabets and spaces.';
+                } else {
+                    searchInputError.textContent = '';
+                }
+    })
 </script>
         <script>
             // Real-time validation for Passenger Name

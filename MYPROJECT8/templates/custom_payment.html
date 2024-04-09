@@ -185,6 +185,8 @@
         <p style="text-align: center;">Travel Package: {{ travel_package.name }}</p>
         <p style="text-align: center;">Starting date of Journey: {{ booking.start_date }}</p>
         <p style="text-align: center;">Duration of Journey:  {{ travel_package.days }} days and {{ travel_package.nights }} night</p>
+        <p style="text-align: center;">Amount per Head: ₹{{ travel_package.price }}</p>
+        <p style="text-align: center;">Total Number of Adults: ₹{{ booking.passenger_limit }}</p>
         <p style="text-align: center;">Total Amount: ₹{{ total_amount|floatformat:0 }}</p>
         <p style="text-align: center;">GST Amount (15%): ₹{{ gst_amount|floatformat:0 }}</p>
         <p style="text-align: center;">Final Price to Pay: ₹{{ final_price|floatformat:0 }}</p>

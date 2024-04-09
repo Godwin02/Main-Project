@@ -123,7 +123,7 @@
             <th>Name</th>
             <th>Age</th>
             <th>ID Proof</th>
-            <th>Delete Passenger</th>
+            <!-- <th>Delete Passenger</th> -->
         </tr>
     </thead>
     <tbody>
@@ -132,9 +132,9 @@
                 <td>{{ passenger.passenger_name }}</td>
                 <td>{{ passenger.passenger_age }}</td>
                 <td><a href="{{ passenger.proof_of_id.url }}">View ID Proof</a></td>
-                <td>
+                <!-- <td>
                     <a href="{% url 'delete_custom_passenger' passenger.id %}" class="btn btn-danger" style="color: #000000;">Delete❌</a>
-                </td>
+                </td> -->
             </tr>
         {% endfor %}
     </tbody>

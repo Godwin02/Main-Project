@@ -238,8 +238,10 @@ input[type="submit"] {
                 </div>
                 <div class="form-group">
                     <label for="id_package_image">Package Image:</label>
-                    <input type="file" name="package_image" id="id_package_image" accept="image/*">
+                    <input type="file" name="package_image" id="id_package_image" accept="image/*" onchange="validateImages()">
+                    <p id="package_image-validation-message" class="text-danger"></p> <!-- Validation message for package image -->
                 </div>
+                
                 <div class="form-group">
                     <label for="id_status">Status:</label>
                     <select name="status" id="id_status">
@@ -268,7 +270,7 @@ input[type="submit"] {
             </div>
 
     
-            <input type="submit" value="Create Package">
+            <input type="submit" value="Create Package" onclick="return validateSheet()">
         </form>
     </div>
     
@@ -276,35 +278,62 @@ input[type="submit"] {
     <script>
         // Function to generate dynamic fields
         function generateDynamicFields() {
-            // Clear existing dynamic fields
-            $('#days-information').empty();
-    
-            // Get the number of days from the days form field
-            var numberOfDays = $('#id_days').val();
-    
-            // Generate fields for each day
-            for (var i = 1; i <= numberOfDays; i++) {
-                var dynamicFieldHTML = `
-                    <div class="formset-form">
-                        <div class="form-group">
-                            <label for="day_image_${i}">Day ${i} Image:</label>
-                            <input type="file" name="day_image_${i}" id="day_image_${i}" accept="image/*">
-                        </div>
-                        <div class="form-group">
-                            <label for="day_image_description_${i}">Day ${i} Image Description:</label>
-                            <textarea name="day_image_description_${i}" id="day_image_description_${i}" required></textarea>
-                        </div>
-                    </div>
-                `;
-                $('#days-information').append(dynamicFieldHTML);
-            }
-        }
-    
-        // Attach the function to the change event of the days input field
-        $('#id_days').on('change', generateDynamicFields);
-    
-        // Initial generation on page load
-        generateDynamicFields();
+    // Clear existing dynamic fields
+    $('#days-information').empty();
+
+    // Get the number of days from the days form field
+    var numberOfDays = $('#id_days').val();
+
+    // Generate fields for each day
+    for (var i = 1; i <= numberOfDays; i++) {
+        var dynamicFieldHTML = `
+            <div class="formset-form">
+                <div class="form-group">
+                    <label for="day_image_${i}">Day ${i} Image:</label>
+                    <input type="file" name="day_image_${i}" id="day_image_${i}" accept="image/*" onchange="validateImage(this)">
+                    <p id="day_image_${i}-validation-message" class="text-danger"></p> <!-- Validation message for day image -->
+                </div>
+                <div class="form-group">
+                    <label for="day_image_description_${i}">Day ${i} Image Description:</label>
+                    <textarea name="day_image_description_${i}" id="day_image_description_${i}" required></textarea>
+                </div>
+            </div>
+        `;
+        $('#days-information').append(dynamicFieldHTML);
+    }
+}
+
+// Attach the function to the change event of the days input field
+$('#id_days').on('change', generateDynamicFields);
+
+// Initial generation on page load
+generateDynamicFields();
+
+function validateImage(input) {
+    const file = input.files[0];
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
+    const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
+    const maxFileSizeInMB = maxSizeInBytes / (1024 * 1024);
+
+    // Get the ID of the file input element
+    const inputId = input.id;
+
+    // Get the validation message element corresponding to the file input
+    const validationMessageElement = document.getElementById(`${inputId}-validation-message`);
+
+    // Check if the selected file is valid
+    if (!file) {
+        validationMessageElement.textContent = 'Please select an image.';
+    } else if (!allowedTypes.includes(file.type)) {
+        validationMessageElement.textContent = 'Only PNG, JPEG, JPG, and SVG images are allowed.';
+    } else if (file.size > maxSizeInBytes) {
+        validationMessageElement.textContent = `File size exceeds the maximum allowed size of ${maxFileSizeInMB}MB.`;
+    } else {
+        // Reset the validation message if the file is valid
+        validationMessageElement.textContent = '';
+    }
+}
+
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -462,6 +491,56 @@ input[type="submit"] {
                 }
             }
         });
+    </script>
+        <script>
+        function validateImages() {
+        const files = document.getElementById('id_package_image').files;
+        const imageValidationMessage = document.getElementById('package_image-validation-message');
+
+        if (files.length === 0) {
+        // No file selected
+        imageValidationMessage.textContent = 'Please select an image.';
+        return;
+        }
+
+        const file = files[0];
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
+
+        if (!allowedTypes.includes(file.type)) {
+        // Invalid file type
+        imageValidationMessage.textContent = 'Only PNG, JPEG, JPG, and SVG images are allowed.';
+        return;
+        }
+
+        const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
+        if (file.size > maxSizeInBytes) {
+        // File size exceeds the maximum allowed size
+        imageValidationMessage.textContent = 'File size exceeds the maximum allowed size of 5MB.';
+        return;
+        }
+
+        // If the file meets all criteria, clear the validation message
+        imageValidationMessage.textContent = '';
+        }
+
+        </script>
+        <script>
+        function validateSheet() {
+        // Check if any validation messages exist
+        const validationMessages = document.querySelectorAll('.text-danger');
+        let isValid = true;
+
+        // Iterate over each validation message
+        validationMessages.forEach(message => {
+        if (message.textContent.trim() !== '') {
+            // If any validation message is not empty, the form is invalid
+            isValid = false;
+        }
+        });
+
+        return isValid;
+        }
+
     </script>
 </body>
 </html>    

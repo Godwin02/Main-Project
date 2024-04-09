@@ -1,4 +1,5 @@
 from datetime import timezone
+import datetime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
@@ -105,25 +106,31 @@ class Booking(models.Model):
         ('Confirmed', 'Confirmed'),
         ('Cancelled', 'Cancelled'),
     )
+    PAYMENT_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Paid', 'Paid'),
+        ('Failed', 'Failed'),
+    ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     package = models.ForeignKey(TravelPackage, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    passenger_limit = models.IntegerField(default=1)  # Adjust default value as needed
-    children=models.IntegerField(default=0)
+    passenger_limit = models.IntegerField(default=1)
+    children = models.IntegerField(default=0)
     
-    # Fields related to payment
-    # total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    # payment_method = models.CharField(max_length=50)
-    # payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='Pending')
-    # payment_date = models.DateTimeField(blank=True, null=True)
-    
-    # Add other common fields for your Booking model
+    # Fields copied from TravelPackage
+    duration = models.PositiveIntegerField(default=1)  # Provide a default value
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Provide a default value
+    start_date = models.DateField(default=datetime.date.today)  # Provide a default value
+    end_date = models.DateField(default=datetime.date.today)
+    payment = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='Pending',)  # New field for payment status
+
 
     def __str__(self):
         return f'Booking ID: {self.id}, User: {self.user}, Package: {self.package}, Status: {self.status}'
+
 
 class Passenger(models.Model):
     passenger_name = models.CharField(max_length=100)
@@ -132,6 +139,8 @@ class Passenger(models.Model):
     package = models.ForeignKey(TravelPackage, on_delete=models.CASCADE)  # Assuming TravelPackage is your package model
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Associate each passenger with a user
     status = models.CharField(max_length=20, default='Pending')  # Assuming 'Pending' is the default status
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name='passengers', null=True, blank=True)
+
     def __str__(self):
         return self.passenger_name
     
@@ -143,7 +152,7 @@ def update_passengers_on_booking_update(sender, instance, **kwargs):
     Passenger.objects.filter(package=instance.package, user=instance.user).update(status=instance.status)
     
 class Payment(models.Model):
-    booking=models.ForeignKey(Booking, on_delete=models.CASCADE, blank=True, null=True)
+    booking=models.ForeignKey(Booking, on_delete=models.CASCADE, blank=True, null=True, related_name='booking')
     is_paid = models.BooleanField(default=False)
     razor_pay_order_id=models.CharField(max_length=100, blank=True, null=True)
     razor_pay_payment_id=models.CharField(max_length=100, blank=True, null=True)
@@ -162,7 +171,10 @@ class Rating(models.Model):
     package = models.ForeignKey(TravelPackage, on_delete=models.CASCADE)
     stars = models.IntegerField(null=False, blank=False, default=0)
     description = models.TextField(blank=True, null=True)
-
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name='ratings', null=True, blank=True)
+    
+    def __str__(self):
+        return f"Rating for {self.package.package_name} by {self.user.username}"
 
 # models.py
 
@@ -216,6 +228,11 @@ class CustomBooking(models.Model):
         ('Confirmed', 'Confirmed'),
         ('Cancelled', 'Cancelled'),
     ]
+    PAYMENT_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Paid', 'Paid'),
+        ('Failed', 'Failed'),
+    ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     package = models.ForeignKey('CustomPackage', on_delete=models.CASCADE, related_name='custom_bookings')
@@ -224,9 +241,11 @@ class CustomBooking(models.Model):
     start_date = models.DateField(null=True)
     passenger_limit = models.IntegerField(default=1, validators=[MinValueValidator(1)], null=True)
     children = models.IntegerField(default=0, null=True)
+    payment = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='Pending')  # New field for payment status
+    updated_at = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
-        return f'Booking ID: {self.id}, User: {self.user}, Package: {self.package}, Status: {self.status}, Boarding: {self.boarding}'
+        return f'Booking ID: {self.id}, User: {self.user}, Package: {self.package}, Status: {self.status}, Boarding: {self.boarding}, Payment: {self.payment}'
 
 class CustomPassenger(models.Model):
     passenger_name = models.CharField(max_length=100)
@@ -261,3 +280,36 @@ class CustomRating(models.Model):
     stars = models.IntegerField(null=False, blank=False, default=0)
 
     description = models.TextField(blank=True, null=True)
+
+class CustomPayment(models.Model):
+    booking=models.ForeignKey(CustomBooking, on_delete=models.CASCADE, blank=True, null=True)
+    is_paid = models.BooleanField(default=False)
+    razor_pay_order_id=models.CharField(max_length=100, blank=True, null=True)
+    razor_pay_payment_id=models.CharField(max_length=100, blank=True, null=True)
+    razor_pay_payment_signature=models.CharField(max_length=100, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Link the payment to a customer
+    amount = models.DecimalField(max_digits=10, decimal_places=2)  # Store the payment amount
+    payment_date = models.DateTimeField(auto_now_add=True)  # Date and time of the payment
+    # Add other fields as per your requirements, like payment status, transaction ID, etc.
+    
+    def __str__(self):
+        return f"Payment of {self.amount} by {self.customer.username} on {self.payment_date}"
+    
+
+class Refund(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    booking=models.ForeignKey(CustomBooking, on_delete=models.CASCADE, blank=True, null=True)
+    name = models.CharField(max_length=100)
+    account_number = models.CharField(max_length=50)
+    ifsc_code = models.CharField(max_length=11)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)  # Store the payment amount
+    is_refunded = models.BooleanField(default=False)
+
+class Accounts(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    booking=models.ForeignKey(Booking, on_delete=models.CASCADE, blank=True, null=True)
+    name = models.CharField(max_length=100)
+    account_number = models.CharField(max_length=50)
+    ifsc_code = models.CharField(max_length=11)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)  # Store the payment amount
+    is_refunded = models.BooleanField(default=False)

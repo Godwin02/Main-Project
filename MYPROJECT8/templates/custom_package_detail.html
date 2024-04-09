@@ -251,7 +251,10 @@
     {% if user.is_authenticated %}
     {% if not passenger %}
     {% if not from_upcoming_journeys %}
-    <a href="{% url 'add_custom_passenger' package.id %}">Book Now</a>
+    <button style="background-color: #007BFF; border-radius: 10px; padding: 5px; height: 40px;">
+      <a href="{% url 'add_custom_passenger' package.id %}" style="text-decoration: none; color: white; display: inline-block; font-size: 14px; line-height: -0;">Book Now</a>
+  </button>
+    
     {% endif %}
     {% endif %}
     {% else %}

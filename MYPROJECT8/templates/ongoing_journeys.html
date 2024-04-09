@@ -96,21 +96,22 @@
     <h1>Ongoing Journeys</h1>
     <p style="font-size: 20px;font-weight: bold;">Stay Safe and Stay Connected.</p>
 <div class="row">
-        {% for package_with_images in packages_with_images %}
-        <div class="col-md-4 mb-4">
+    {% for journey in packages_with_images %}
+    <div class="col-md-4 mb-4">
             <div class="card">
                 <!-- Display the first image if available -->
-                <a href="/package/{{ package_with_images.package.id }}?from_upcoming_journeys=true">
-                {% if package_with_images.images.first %}
-                <img src="{{ package_with_images.images.first.image.url }}" class="card-img-top" alt="Package Image">
+                <a href="{% url 'package_detail' journey.package.id %}">
+                    {% if package_images %}
+                <img src="{{ package_images.0.image.url }}" class="card-img-top" alt="Package Image">
                 {% else %}
                 <img src="{% static 'path_to_default_image.jpg' %}" class="card-img-top" alt="Default Image">
                 {% endif %}
                 </a>
                 <div class="card-body">
-                    <h5 class="card-title">{{ package_with_images.package.package_name }}</h5>
-                    <p class="card-text">Start Date: {{ package_with_images.package.start_date }}</p>
-                    <p class="card-text">End Date: {{ package_with_images.package.end_date }}</p>
+                    <h5 class="card-title">{{ journey.package.package_name }}</h5>
+                    <p class="card-text">Start Date: {{ journey.start_date }}</p>
+                    <p class="card-text">End Date: {{ journey.end_date }}</p>
+                    <p class="card-text">Destination: {{ journey.package.destination }}</p>
                     <!-- Add more details as needed -->
                 </div>
             </div>
