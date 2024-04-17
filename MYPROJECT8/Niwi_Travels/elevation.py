@@ -190,7 +190,7 @@ datagen = ImageDataGenerator(rotation_range=20, width_shift_range=0.2,
 # Define hyperparameters
 LEARNING_RATE = 0.015
 BATCH_SIZE = 32
-EPOCHS = 15
+EPOCHS = 1
 DROPOUT_RATE = 0.7
 
 # Load the pre-trained VGG16 model without the top (fully connected) layers

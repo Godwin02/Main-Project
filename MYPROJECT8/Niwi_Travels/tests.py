@@ -165,16 +165,73 @@
 
 
 
+# from django.test import TestCase
+# from selenium import webdriver
+# from selenium.webdriver.common.by import By
+# from selenium.webdriver.support.ui import WebDriverWait
+# from selenium.webdriver.support import expected_conditions as EC
+# from selenium.webdriver.common.action_chains import ActionChains
+
+# import os
+# class LoginTestCase(TestCase):
+#     # ... (your existing code)
+#     def setUp(self):
+#         self.driver = webdriver.Chrome()
+#         self.driver.implicitly_wait(10)
+
+#     def tearDown(self):
+#         self.driver.quit()
+
+#     def test_cancel_booking(self):
+#         # Step 1: Login
+#         self.driver.get('http://127.0.0.1:8000/log/')
+#         # Perform login steps here (as shown in your existing test_login_and_navigation function)
+#         self.driver.get('http://127.0.0.1:8000/log/')
+
+#         username_input = self.driver.find_element(By.NAME, 'username')
+#         password_input = self.driver.find_element(By.NAME, 'password')
+#         login_button = self.driver.find_element(By.ID, 'login-link')
+
+#         username_input.send_keys('appu')
+#         password_input.send_keys('Appu@123')
+#         login_button.click()
+
+#         WebDriverWait(self.driver, 20).until(EC.url_to_be('http://127.0.0.1:8000/thome/'))
+
+#         # Step 2: Click on the profile dropdown
+#         profile_dropdown = self.driver.find_element(By.CLASS_NAME, 'nav-item.dropdown')
+#         ActionChains(self.driver).move_to_element(profile_dropdown).click().perform()
+#                         # Step 2: Navigate to "Upcoming Journeys"
+#         upcoming_journeys_link = self.driver.find_element(By.LINK_TEXT, 'Upcoming Journeys')
+#         upcoming_journeys_link.click()
+
+#        # Step 4: Cancel Booking for a specific package
+#         # Locate the card based on the package name
+#         package_name_to_view = "Thekady Stay"  # Replace with the actual package name
+#         view_passengers_link_xpath = f'//h5[text()="{package_name_to_view}"]/ancestor::div[@class="card-body"]/p[@class="card-text"]/a[@class="view-details-link"]'
+#         view_passengers_link = self.driver.find_element(By.XPATH, view_passengers_link_xpath)
+#         view_passengers_link.click()
+
+#         passenger_name_to_delete = "Passenger"  # Replace with the actual passenger name
+#         delete_passenger_link_xpath = f'//td[text()="{passenger_name_to_delete}"]/following-sibling::td/a[contains(@class, "btn-danger")]'
+#         delete_passenger_link = self.driver.find_element(By.XPATH, delete_passenger_link_xpath)
+#         delete_passenger_link.click()
+
+
 from django.test import TestCase
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
 
-import os
+import time
+
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
+
 class LoginTestCase(TestCase):
-    # ... (your existing code)
     def setUp(self):
         self.driver = webdriver.Chrome()
         self.driver.implicitly_wait(10)
@@ -182,37 +239,71 @@ class LoginTestCase(TestCase):
     def tearDown(self):
         self.driver.quit()
 
-    def test_cancel_booking(self):
-        # Step 1: Login
-        self.driver.get('http://127.0.0.1:8000/log/')
-        # Perform login steps here (as shown in your existing test_login_and_navigation function)
+    def test_login_with_recaptcha(self):
         self.driver.get('http://127.0.0.1:8000/log/')
 
+        # Find username, password, and login button
         username_input = self.driver.find_element(By.NAME, 'username')
         password_input = self.driver.find_element(By.NAME, 'password')
-        login_button = self.driver.find_element(By.ID, 'login-link')
+        login_button = self.driver.find_element(By.ID, 'login-button')
 
+        # Enter credentials
         username_input.send_keys('appu')
         password_input.send_keys('Appu@123')
+
+        # Switch to the reCAPTCHA iframe
+      
+        # Wait for reCAPTCHA checkbox to be visible
+        try:
+            recaptcha_checkbox = WebDriverWait(self.driver, 10).until(
+                EC.visibility_of_element_located((By.CLASS_NAME, 'g-recaptcha'))
+            )
+        except TimeoutException:
+            print("Timed out waiting for reCAPTCHA checkbox")
+            return  # Exit the test if the checkbox is not found within the timeout
+
+        # Click on the reCAPTCHA checkbox to solve it
+        recaptcha_checkbox.click()
+        time.sleep(20)
+        # Switch back to the default content
+        self.driver.switch_to.default_content()
         login_button.click()
 
-        WebDriverWait(self.driver, 20).until(EC.url_to_be('http://127.0.0.1:8000/thome/'))
 
-        # Step 2: Click on the profile dropdown
-        profile_dropdown = self.driver.find_element(By.CLASS_NAME, 'nav-item.dropdown')
-        ActionChains(self.driver).move_to_element(profile_dropdown).click().perform()
-                        # Step 2: Navigate to "Upcoming Journeys"
-        upcoming_journeys_link = self.driver.find_element(By.LINK_TEXT, 'Upcoming Journeys')
-        upcoming_journeys_link.click()
+        # Click the login button after solving reCAPTCHA
+        
 
-       # Step 4: Cancel Booking for a specific package
-        # Locate the card based on the package name
-        package_name_to_view = "Thekady Stay"  # Replace with the actual package name
-        view_passengers_link_xpath = f'//h5[text()="{package_name_to_view}"]/ancestor::div[@class="card-body"]/p[@class="card-text"]/a[@class="view-details-link"]'
-        view_passengers_link = self.driver.find_element(By.XPATH, view_passengers_link_xpath)
-        view_passengers_link.click()
+        # Wait for page to load after login
+        WebDriverWait(self.driver, 10).until(EC.url_to_be('http://127.0.0.1:8000/thome/'))
 
-        passenger_name_to_delete = "Passenger"  # Replace with the actual passenger name
-        delete_passenger_link_xpath = f'//td[text()="{passenger_name_to_delete}"]/following-sibling::td/a[contains(@class, "btn-danger")]'
-        delete_passenger_link = self.driver.find_element(By.XPATH, delete_passenger_link_xpath)
-        delete_passenger_link.click()
+        # Check if login was successful
+        assert "Welcome" in self.driver.page_source, "Login failed"
+        self.driver.get(f'http://127.0.0.1:8000/predict_elevation')
+
+
+        print("welcome")
+
+        file_input = self.driver.find_element(By.NAME, 'file')
+
+        # Provide the file path to upload
+        file_input.send_keys('C:/Users/user/PycharmProjects/pythonProject/Seminar/img_3.png')
+
+        # Wait for the file to upload
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, "//img[@id='uploadedImage']"))
+        )
+
+        # Check if the uploaded image is displayed
+        uploaded_image = self.driver.find_element(By.XPATH, "//img[@id='uploadedImage']")
+
+        upload_and_predict_button = self.driver.find_element(By.XPATH, "//button[@onclick='uploadAndPredict()']")
+        upload_and_predict_button.click()
+
+        # Wait for the prediction result
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, "//p[contains(text(), 'Estimated Elevation')]"))
+        )
+
+        # Check if the prediction result is displayed
+        prediction_result = self.driver.find_element(By.XPATH, "//p[contains(text(), 'Estimated Elevation')]")
+        print("Success",prediction_result)

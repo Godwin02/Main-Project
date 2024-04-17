@@ -105,6 +105,8 @@ urlpatterns = [
     path('accounts/<int:booking_id>/', views.accounts, name='accounts'),
     path('export-analysis-data/', views.export_analysis_data_to_excel, name='export_analysis_data_to_excel'),
     path('process-ifsc-code/', views.process_ifsc_code, name='process_ifsc_code'),
+    path('view_refunds_and_accounts/', views.view_refunds_and_accounts, name='view_refunds_and_accounts'),
+    path('update-refund-status/<int:refund_id>/', views.update_refund_status, name='update_refund_status'),
 
     path('search/', views.search_and_store_place, name='search_and_store_place'),
     path('get_place_suggestions/', views.get_place_suggestions, name='get_place_suggestions'),

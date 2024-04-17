@@ -2591,7 +2591,21 @@ def export_analysis_data_to_excel(request):
 
 # views.py
 
+def view_refunds_and_accounts(request):
+    # Query the Refund and Accounts objects from the database
+    refunds = Refund.objects.all()
+    accounts = Accounts.objects.all()
+    
+    # Render the template with the refunds and accounts data
+    return render(request, 'view_refunds_and_accounts.html', {'refunds': refunds, 'accounts': accounts})
 
+def update_refund_status(request, refund_id):
+    refund = get_object_or_404(Refund, id=refund_id)
+    if request.method == 'POST':
+        is_refunded = request.POST.get('is_refunded')  # Get the value of is_refunded from the form
+        refund.is_refunded = is_refunded  # Update the refund status
+        refund.save()
+        return redirect('view_refunds_and_accounts')  # Redirect to the refunds page after update
 
 from django.shortcuts import render
 from django.http import HttpResponse
