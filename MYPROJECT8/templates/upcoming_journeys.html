@@ -123,10 +123,21 @@
             {% if user.is_authenticated %}
             {% if journey.start_date > two_days_before_start_date %}
 
-                <form method="POST" action="{% url 'cancel_booking' journey.id %}">
-                    {% csrf_token %}
-                    <button type="submit" name="cancel" class="btn btn-danger">Cancel Booking</button>
-                </form>
+            <form id="cancelForm" method="POST" action="{% url 'cancel_booking' journey.id %}">
+                {% csrf_token %}
+                <button type="button" onclick="confirmCancel()" class="btn btn-danger">Cancel Booking</button>
+            </form>
+            
+            <script>
+                function confirmCancel() {
+                    // Display an alert
+                    if (confirm("Are you sure you want to cancel the booking?")) {
+                        // If the user clicks OK, submit the form
+                        document.getElementById("cancelForm").submit();
+                    }
+                }
+            </script>
+            
             {% endif%}
                 {% if journey.status == 'Confirmed' %}
                 {% if journey.payment == 'Paid' %}
@@ -180,10 +191,21 @@
                         <!-- Add more details as needed -->
                         {% if user.is_authenticated %}
                 {% if journey.start_date > two_days_before_start_date %}
-                    <form method="POST" action="{% url 'cancel_custom_booking' journey.id %}">
-                        {% csrf_token %}
-                        <button type="submit" name="cancel" class="btn btn-danger">Cancel Booking</button>
-                    </form>
+                <form id="cancelForm" method="POST" action="{% url 'cancel_custom_booking' journey.id %}">
+                    {% csrf_token %}
+                    <button type="button" onclick="confirmCancel()" class="btn btn-danger">Cancel Booking</button>
+                </form>
+                
+                <script>
+                    function confirmCancel() {
+                        // Display an alert
+                        if (confirm("Are you sure you want to cancel the booking?")) {
+                            // If the user clicks OK, submit the form
+                            document.getElementById("cancelForm").submit();
+                        }
+                    }
+                </script>
+                
                 {% endif %}
                     {% if journey.status == 'Confirmed' %}
                         {% if journey.payment == 'Paid' %}

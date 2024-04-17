@@ -142,7 +142,21 @@
 
     <!-- Display the predicted elevation -->
     {% if predicted_elevation %}
+    {% if predicted_elevation > 8000 %}
+    <p>Attention: The estimated elevation of the mountain is {{ predicted_elevation }} meters, which is extremely high. <br>Please take necessary precautions before exploring such high-altitude areas:</p>
+    <ul>
+        <li>Acclimatization</li>
+        <li>Adequate hydration</li>
+        <li>Appropriate gear</li>
+        <li>High-energy snacks</li>
+        <li>Emergency shelter</li>
+        <li>Navigation tools (map, compass, GPS)</li>
+        <li>First aid kit</li>
+        <li>Communication device (cell phone, satellite phone, radio)</li>
+    </ul>
+    {% else %}
         <p>Estimated Elevation of the Mountain is {{ predicted_elevation }} meters.</p>
+    {% endif %}
     {% else %}
     <p>{{ message }}</p>
     {% endif %}

@@ -2591,6 +2591,8 @@ def export_analysis_data_to_excel(request):
 
 # views.py
 
+
+
 from django.shortcuts import render
 from django.http import HttpResponse
 from .elevation import model, preprocess_image

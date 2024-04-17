@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5; /* Set background color */
+            background-color: #ffffcc; /* Set background color */
             margin: 0;
             padding: 0;
             height: 100%;
@@ -21,11 +21,10 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
-            text-align: center;
             color: #333; /* Set text color */
-            min-height: 100%;
-            position: relative;
             box-sizing: border-box;
+            overflow: hidden; /* Ensure content doesn't overflow */
+            border: 2px solid #ddd; /* Add border for visual separation */
         }
 
         .header {
@@ -35,28 +34,41 @@
         }
 
         .info {
-            margin-bottom: 5px;
-            text-align: left;
+            margin-bottom: 20px;
         }
 
         .info p {
-            margin: 2px 0; /* Adjust the margin between each line */
+            margin: 5px 0; /* Adjust the margin between each line */
         }
 
         .footer {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
             text-align: center;
             padding: 10px;
             background-color: #f5f5f5; /* Set footer background color */
             color: #777; /* Set footer text color */
+            position: absolute;
+            bottom: 0;
+            width: 100%;
         }
 
         .logo {
             float: right;
             max-width: 100px; /* Set the maximum width for the logo */
             margin-top: -30px; /* Adjust the margin to position the logo */
+        }
+
+        .photo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .photo {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            border: 2px solid #ddd; /* Add border for visual separation */
+            margin-bottom: 10px; /* Add margin between photos */
         }
     </style>
 </head>
@@ -70,7 +82,7 @@
             <p style="text-align: center;"><strong>User Details</strong></p>
             <p><strong>Name:</strong> {{ user_details.first_name }} {{ user_details.last_name }}</p>
             <p><strong>Phone Number:</strong> {{ user_details.phone_number }}</p>
-            <p><strong>Number of Passengers for {{ booking.package.package_name }} :</strong>{{ passengers.count }}</p>
+            <p><strong>Number of Passengers for {{ booking.package.name }} :</strong>{{ passengers.count }}</p>
             
             <p style="text-align: center;"><strong>Package Details</strong></p>
             <p><strong>Destination:</strong> {{ booking.package.name }}</p>
@@ -81,6 +93,11 @@
             <p><strong>Amount Paid:</strong> {{ payment.amount }}</p>
             <!-- Add more payment fields as needed -->
         </div>
+        <div class="photo-container">
+            <img src="{% static 'Niwi_Travels/images/about.jpg' %}" alt="Photo 1" class="photo">
+            <img src="{% static 'Niwi_Travels/images/adventure.jpg' %}" alt="Photo 2" class="photo">
+            <!-- Add more photos as needed -->
+        </div><br><br><br><br>
         <div class="footer">
             <p>Thank You for Booking with Niwi Travels!</p>
             <p>For any Queries feel free to Contact Niwi Travels: godwinbmenachery2024a@mca.ajce.in | 8078152909 </p>
